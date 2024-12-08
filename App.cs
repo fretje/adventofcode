@@ -1,7 +1,4 @@
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
+﻿using System.Reflection;
 
 using AdventOfCode;
 
@@ -11,46 +8,50 @@ var tsolvers = Assembly.GetEntryAssembly()!.GetTypes()
     .ToArray();
 
 var action =
-    Command(args, Args("update", "([0-9]+)/([0-9]+)"), m => {
+    Command(args, Args("update", "([0-9]+)/([0-9]+)"), m =>
+    {
         var year = int.Parse(m[1]);
         var day = int.Parse(m[2]);
-        return () => new Updater().Update(year, day).Wait();
+        return () => Updater.Update(year, day).Wait();
     }) ??
-    Command(args, Args("update", "today"), m => {
+    Command(args, Args("update", "today"), m =>
+    {
         var dt = DateTime.UtcNow.AddHours(-5);
-        if (dt is { Month: 12, Day: >= 1 and <= 25 }) {
-            return () => new Updater().Update(dt.Year, dt.Day).Wait();
-        } else {
-            throw new AocCommuncationError("Event is not active. This option works in Dec 1-25 only)");
-        }
+        return dt is { Month: 12, Day: >= 1 and <= 25 }
+            ? (() => Updater.Update(dt.Year, dt.Day).Wait())
+            : throw new AocCommuncationError("Event is not active. This option works in Dec 1-25 only)");
     }) ??
-    Command(args, Args("upload", "([0-9]+)/([0-9]+)"), m => {
+    Command(args, Args("upload", "([0-9]+)/([0-9]+)"), m =>
+    {
         var year = int.Parse(m[1]);
         var day = int.Parse(m[2]);
-        return () => {
+        return () =>
+        {
             var tsolver = tsolvers.First(tsolver =>
                 SolverExtensions.Year(tsolver) == year &&
                 SolverExtensions.Day(tsolver) == day);
 
-            new Updater().Upload(GetSolvers(tsolver)[0]).Wait();
+            Updater.Upload(GetSolvers(tsolver)[0]).Wait();
         };
     }) ??
-    Command(args, Args("upload", "today"), m => {
+    Command(args, Args("upload", "today"), m =>
+    {
         var dt = DateTime.UtcNow.AddHours(-5);
-        if (dt is { Month: 12, Day: >= 1 and <= 25 }) {
-
+        if (dt is { Month: 12, Day: >= 1 and <= 25 })
+        {
             var tsolver = tsolvers.First(tsolver =>
                 SolverExtensions.Year(tsolver) == dt.Year &&
                 SolverExtensions.Day(tsolver) == dt.Day);
 
-            return () =>
-                new Updater().Upload(GetSolvers(tsolver)[0]).Wait();
-
-        } else {
+            return () => Updater.Upload(GetSolvers(tsolver)[0]).Wait();
+        }
+        else
+        {
             throw new AocCommuncationError("Event is not active. This option works in Dec 1-25 only)");
         }
     }) ??
-    Command(args, Args("([0-9]+)/(Day)?([0-9]+)"), m => {
+    Command(args, Args("([0-9]+)/(Day)?([0-9]+)"), m =>
+    {
         var year = int.Parse(m[0]);
         var day = int.Parse(m[2]);
         var tsolversSelected = tsolvers.First(tsolver =>
@@ -58,124 +59,130 @@ var action =
             SolverExtensions.Day(tsolver) == day);
         return () => Runner.RunAll(GetSolvers(tsolversSelected));
     }) ??
-        Command(args, Args("[0-9]+"), m => {
-            var year = int.Parse(m[0]);
-            var tsolversSelected = tsolvers.Where(tsolver =>
-                SolverExtensions.Year(tsolver) == year);
-            return () => Runner.RunAll(GetSolvers(tsolversSelected.ToArray()));
-        }) ??
-    Command(args, Args("([0-9]+)/all"), m => {
+    Command(args, Args("[0-9]+"), m =>
+    {
         var year = int.Parse(m[0]);
         var tsolversSelected = tsolvers.Where(tsolver =>
             SolverExtensions.Year(tsolver) == year);
         return () => Runner.RunAll(GetSolvers(tsolversSelected.ToArray()));
     }) ??
-    Command(args, Args("all"), m => {
-        return () => Runner.RunAll(GetSolvers(tsolvers));
+    Command(args, Args("([0-9]+)/all"), m =>
+    {
+        var year = int.Parse(m[0]);
+        var tsolversSelected = tsolvers.Where(tsolver =>
+            SolverExtensions.Year(tsolver) == year);
+        return () => Runner.RunAll(GetSolvers(tsolversSelected.ToArray()));
     }) ??
-    Command(args, Args("today"), m => {
+    Command(args, Args("all"), m => () =>
+        Runner.RunAll(GetSolvers(tsolvers))) ??
+    Command(args, Args("today"), m =>
+    {
         var dt = DateTime.UtcNow.AddHours(-5);
-        if (dt is { Month: 12, Day: >= 1 and <= 25 }) {
-
+        if (dt is { Month: 12, Day: >= 1 and <= 25 })
+        {
             var tsolversSelected = tsolvers.First(tsolver =>
                 SolverExtensions.Year(tsolver) == dt.Year &&
                 SolverExtensions.Day(tsolver) == dt.Day);
 
             return () =>
                 Runner.RunAll(GetSolvers(tsolversSelected));
-
-        } else {
+        }
+        else
+        {
             throw new AocCommuncationError("Event is not active. This option works in Dec 1-25 only)");
         }
     }) ??
-    Command(args, Args("calendars"), _ => {
-        return () => {
-            var tsolversSelected = (
-                    from tsolver in tsolvers
-                    group tsolver by SolverExtensions.Year(tsolver) into g
-                    orderby SolverExtensions.Year(g.First()) descending
-                    select g.First()
-                ).ToArray();
+    Command(args, Args("calendars"), _ => () =>
+    {
+        var tsolversSelected = 
+            (from tsolver in tsolvers
+             group tsolver by SolverExtensions.Year(tsolver) into g
+             orderby SolverExtensions.Year(g.First()) descending
+             select g.First()).ToArray();
 
-            var solvers = GetSolvers(tsolversSelected);
-            foreach (var solver in solvers) {
-                solver.SplashScreen().Show();
-            }
-        };
+        var solvers = GetSolvers(tsolversSelected);
+        foreach (var solver in solvers)
+        {
+            solver.SplashScreen().Show();
+        }
     }) ??
-    new Action(() => {
-        Console.WriteLine(Usage.Get());
-    });
+    new Action(() => Console.WriteLine(Usage.Get()));
 
-try {
+try
+{
     action();
-} catch (AggregateException a) {
-    if (a.InnerExceptions.Count == 1 && a.InnerException is AocCommuncationError) {
+}
+catch (AggregateException a)
+{
+    if (a.InnerExceptions.Count == 1 && a.InnerException is AocCommuncationError)
+    {
         Console.WriteLine(a.InnerException.Message);
-    } else {
+    }
+    else
+    {
         throw;
     }
 }
 
-Solver[] GetSolvers(params Type[] tsolver) {
-    return tsolver.Select(t => Activator.CreateInstance(t) as Solver).ToArray();
-}
+Solver[] GetSolvers(params Type[] tsolver) => [.. tsolver.Select(t => (Solver)Activator.CreateInstance(t)!)];
 
-Action Command(string[] args, string[] regexes, Func<string[], Action> parse) {
-    if (args.Length != regexes.Length) {
+Action? Command(string[] args, string[] regexes, Func<string[], Action> parse)
+{
+    if (args.Length != regexes.Length)
+    {
         return null;
     }
     var matches = Enumerable.Zip(args, regexes, (arg, regex) => new Regex("^" + regex + "$").Match(arg));
-    if (!matches.All(match => match.Success)) {
+    if (!matches.All(match => match.Success))
+    {
         return null;
     }
-    try {
-
+    try
+    {
         return parse(matches.SelectMany(m =>
                 m.Groups.Count > 1 ? m.Groups.Cast<Group>().Skip(1).Select(g => g.Value)
-                                   : new[] { m.Value }
-            ).ToArray());
-    } catch {
+                                   : [m.Value])
+            .ToArray());
+    }
+    catch
+    {
         return null;
     }
 }
 
-string[] Args(params string[] regex) {
-    return regex;
-}
+string[] Args(params string[] regex) => regex;
 
-class Usage {
-    public static string Get() {
-        return $"""
-            Usage: dotnet run [arguments]
-            1) To run the solutions and admire your advent calendar:
+internal class Usage
+{
+    public static string Get() => $"""
+        Usage: dotnet run [arguments]
+        1) To run the solutions and admire your advent calendar:
 
-             [year]/[day|all]      Solve the specified problems
-             today                 Shortcut to the above
-             [year]                Solve the whole year
-             all                   Solve everything
+            [year]/[day|all]      Solve the specified problems
+            today                 Shortcut to the above
+            [year]                Solve the whole year
+            all                   Solve everything
 
-             calendars             Show the calendars
+            calendars             Show the calendars
 
-            2) To start working on new problems:
-            login to https://adventofcode.com, then copy your session cookie, and export 
-            it in your console like this
+        2) To start working on new problems:
+        login to https://adventofcode.com, then copy your session cookie, and export 
+        it in your console like this
 
-             export SESSION=73a37e9a72a...
+            export SESSION=73a37e9a72a...
 
-            then run the app with
+        then run the app with
 
-             update [year]/[day]   Prepares a folder for the given day, updates the input,
-                                   the readme and creates a solution template.
-             update today          Shortcut to the above.
+            update [year]/[day]   Prepares a folder for the given day, updates the input,
+                                the readme and creates a solution template.
+            update today          Shortcut to the above.
 
-            3) To upload your answer:
-            set up your SESSION variable as above.
+        3) To upload your answer:
+        set up your SESSION variable as above.
 
-             upload [year]/[day]   Upload the answer for the selected year and day.
-             upload today          Shortcut to the above.
+            upload [year]/[day]   Upload the answer for the selected year and day.
+            upload today          Shortcut to the above.
 
-            4) Don't forget to tip the maintainer https://github.com/sponsors/encse.
-            """;
-    }
+        4) Don't forget to tip the maintainer https://github.com/sponsors/encse.
+        """;
 }

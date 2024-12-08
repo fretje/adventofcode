@@ -1,13 +1,13 @@
-using System;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using AdventOfCode.Model;
 
 namespace AdventOfCode.Generator;
 
-class SplashScreenGenerator {
-    public string Generate(Calendar calendar) {
-        string calendarPrinter = CalendarPrinter(calendar);
+internal class SplashScreenGenerator
+{
+    public static string Generate(Calendar calendar)
+    {
+        var calendarPrinter = CalendarPrinter(calendar);
         return $$"""
             using System;
             
@@ -30,14 +30,17 @@ class SplashScreenGenerator {
             """;
     }
 
-    private string CalendarPrinter(Calendar calendar) {
+    private static string CalendarPrinter(Calendar calendar)
+    {
 
         var lines = calendar.Lines.Select(line =>
             new[] { new CalendarToken { Text = "           " } }.Concat(line)).ToList();
 
         var bw = new BufferWriter();
-        foreach (var line in lines) {
-            foreach (var token in line) {
+        foreach (var line in lines)
+        {
+            foreach (var token in line)
+            {
                 bw.Write(token.ConsoleColor, token.Text, token.Bold);
             }
 
@@ -46,19 +49,19 @@ class SplashScreenGenerator {
         return bw.GetContent();
     }
 
-    bool Matches(string[] selector, object x){
-        return true;
-    }
+    private class BufferWriter
+    {
+        private readonly StringBuilder sb = new();
+        private int bufferColor = -1;
+        private string buffer = "";
+        private bool bufferBold;
 
-    class BufferWriter {
-        StringBuilder sb = new StringBuilder();
-        int bufferColor = -1;
-        string buffer = "";
-        bool bufferBold;
-
-        public void Write(int color, string text, bool bold) {
-            if (!string.IsNullOrWhiteSpace(text)) {
-                if (!string.IsNullOrWhiteSpace(buffer) && (color != bufferColor || this.bufferBold != bold) ) {
+        public void Write(int color, string text, bool bold)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                if (!string.IsNullOrWhiteSpace(buffer) && (color != bufferColor || bufferBold != bold))
+                {
                     Flush();
                 }
                 bufferColor = color;
@@ -67,17 +70,20 @@ class SplashScreenGenerator {
             buffer += text;
         }
 
-        private void Flush() {
-            while (buffer.Length > 0) {
-                var block = buffer.Substring(0, Math.Min(100, buffer.Length));
-                buffer = buffer.Substring(block.Length);
+        private void Flush()
+        {
+            while (buffer.Length > 0)
+            {
+                var block = buffer[..Math.Min(100, buffer.Length)];
+                buffer = buffer[block.Length..];
                 block = block.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n");
                 sb.AppendLine($@"Write(0x{bufferColor.ToString("x")}, {bufferBold.ToString().ToLower()}, ""{block}"");");
             }
             buffer = "";
         }
 
-        public string GetContent() {
+        public string GetContent()
+        {
             Flush();
             return sb.ToString();
         }

@@ -1,4 +1,6 @@
 namespace AdventOfCode;
-interface SplashScreen {
+
+internal interface SplashScreen
+{
     void Show();
 }

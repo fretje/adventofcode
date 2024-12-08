@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "adventofcode": {
+      "commandName": "Project",
+      "commandLineArgs": "2024/all",
+      "workingDirectory": "$(SolutionDir)\\"
+    }
+  }
+}

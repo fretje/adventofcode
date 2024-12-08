@@ -5,6 +5,8 @@
     <LangVersion>13</LangVersion>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <UseAppHost>false</UseAppHost>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.14.0" />

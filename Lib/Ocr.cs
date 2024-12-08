@@ -1,27 +1,26 @@
-using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-
 namespace AdventOfCode;
 
-static class OcrExtension {
-    public static OcrString Ocr(this string st) {
-        return new OcrString(st);
-    }
+internal static class OcrExtension
+{
+    public static OcrString Ocr(this string st) => new(st);
 }
 
-record OcrString(string st) {
-    public override string ToString() {
+internal record OcrString(string st)
+{
+    public override string ToString()
+    {
         var lines = st.Split("\n")
-            .SkipWhile(x => string.IsNullOrWhiteSpace(x))
+            .SkipWhile(string.IsNullOrWhiteSpace)
             .TakeWhile(x => !string.IsNullOrWhiteSpace(x))
             .ToArray();
 
-        while (lines.All(line => line.StartsWith(" "))) {
+        while (lines.All(line => line.StartsWith(" ")))
+        {
             lines = GetRect(lines, 1, 0, lines[0].Length - 1, lines.Length).Split("\n");
         }
 
-        while (lines.All(line => line.EndsWith(" "))) {
+        while (lines.All(line => line.EndsWith(" ")))
+        {
             lines = GetRect(lines, 0, 0, lines[0].Length - 1, lines.Length).Split("\n");
         }
 
@@ -60,25 +59,30 @@ record OcrString(string st) {
         var charWidth = charMap == smallAlphabet ? 5 : 8;
         var charHeight = charMap == smallAlphabet ? 6 : 10;
         var res = "";
-        for (var i = 0; i < width; i += charWidth) {
+        for (var i = 0; i < width; i += charWidth)
+        {
             res += Detect(lines, i, charWidth, charHeight, charMap);
         }
         return res;
     }
 
-    public string Detect(string[] text, int icolLetter, int charWidth, int charHeight, string[] charMap) {
+    public static string Detect(string[] text, int icolLetter, int charWidth, int charHeight, string[] charMap)
+    {
         var textRect = GetRect(text, icolLetter, 0, charWidth, charHeight);
 
-        for (var icol = 0; icol < charMap[0].Length; icol += charWidth) {
+        for (var icol = 0; icol < charMap[0].Length; icol += charWidth)
+        {
             var ch = charMap[0][icol].ToString();
             var charPattern = GetRect(charMap, icol, 1, charWidth, charHeight);
-            var found = Enumerable.Range(0, charPattern.Length).All(i => {
+            var found = Enumerable.Range(0, charPattern.Length).All(i =>
+            {
                 var textWhiteSpace = " .".Contains(textRect[i]);
                 var charWhiteSpace = " .".Contains(charPattern[i]);
                 return textWhiteSpace == charWhiteSpace;
             });
 
-            if (found) {
+            if (found)
+            {
                 return ch;
             }
         }
@@ -86,14 +90,18 @@ record OcrString(string st) {
         throw new Exception($"Unrecognized letter: \n{textRect}\n");
     }
 
-    string GetRect(string[] st, int icol0, int irow0, int ccol, int crow) {
+    private static string GetRect(string[] st, int icol0, int irow0, int ccol, int crow)
+    {
         var res = "";
-        for (var irow = irow0; irow < irow0 + crow; irow++) {
-            for (var icol = icol0; icol < icol0 + ccol; icol++) {
+        for (var irow = irow0; irow < irow0 + crow; irow++)
+        {
+            for (var icol = icol0; icol < icol0 + ccol; icol++)
+            {
                 var ch = irow < st.Length && icol < st[irow].Length ? st[irow][icol] : ' ';
                 res += ch;
             }
-            if (irow + 1 != irow0 + crow) {
+            if (irow + 1 != irow0 + crow)
+            {
                 res += "\n";
             }
         }
