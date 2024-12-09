@@ -4,12 +4,12 @@
 internal class Solution : Solver
 {
     public object PartOne(string[] lines) =>
-        CountValidEquations(lines, ['+', '*']);
+        SumValidEquations(lines, ['+', '*']);
 
     public object PartTwo(string[] lines) =>
-        CountValidEquations(lines, ['+', '*', '|']);
+        SumValidEquations(lines, ['+', '*', '|']);
 
-    private static long CountValidEquations(string[] lines, char[] possibleOperators) => 
+    private static long SumValidEquations(string[] lines, char[] possibleOperators) => 
         Parse(lines)
             .Sum(line => HasValidEquation(line.TestValue, line.Numbers, possibleOperators) 
                     ? line.TestValue : 0);
