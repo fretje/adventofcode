@@ -9,30 +9,27 @@ internal class SplashScreenGenerator
     {
         var calendarPrinter = CalendarPrinter(calendar);
         return $$"""
-            using System;
-            
             namespace AdventOfCode.Y{{calendar.Year}};
             
-            class SplashScreenImpl : SplashScreen {
-            
-                public void Show() {
-            
+            internal class SplashScreenImpl : SplashScreen
+            {
+                public void Show()
+                {
                     var color = Console.ForegroundColor;
-                    {{calendarPrinter.Indent(12)}}
+                    {{calendarPrinter.Indent(8)}}
                     Console.ForegroundColor = color;
                     Console.WriteLine();
                 }
-            
-                private static void Write(int rgb, bool bold, string text){
-                   Console.Write($"\u001b[38;2;{(rgb>>16)&255};{(rgb>>8)&255};{rgb&255}{(bold ? ";1" : "")}m{text}");
-                }
+
+                private static void Write(int rgb, bool bold, string text) =>
+                    Console.Write($"\u001b[38;2;{(rgb>>16)&255};{(rgb>>8)&255};{rgb&255}{(bold ? ";1" : "")}m{text}");
             }
+
             """;
     }
 
     private static string CalendarPrinter(Calendar calendar)
     {
-
         var lines = calendar.Lines.Select(line =>
             new[] { new CalendarToken { Text = "           " } }.Concat(line)).ToList();
 

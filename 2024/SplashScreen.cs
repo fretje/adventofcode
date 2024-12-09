@@ -2,14 +2,12 @@ namespace AdventOfCode.Y2024;
 
 internal class SplashScreenImpl : SplashScreen
 {
-
     public void Show()
     {
-
         var color = Console.ForegroundColor;
         Write(0xcc00, false, "           ▄█▄ ▄▄█ ▄ ▄ ▄▄▄ ▄▄ ▄█▄  ▄▄▄ ▄█  ▄▄ ▄▄▄ ▄▄█ ▄▄▄\n           █▄█ █ █ █ █ █▄█ █ █ █   █ █ █▄ ");
-        Write(0xcc00, false, " █  █ █ █ █ █▄█\n           █ █ █▄█ ▀▄▀ █▄▄ █ █ █▄  █▄█ █   █▄ █▄█ █▄█ █▄▄  {:year 2024}\n            ");
-        Write(0xcc00, false, "\n           ");
+        Write(0xcc00, false, " █  █ █ █ █ █▄█\n           █ █ █▄█ ▀▄▀ █▄▄ █ █ █▄  █▄█ █   █▄ █▄█ █▄█ █▄▄  /* 2024 */\n            \n ");
+        Write(0xcc00, false, "          ");
         Write(0x888888, false, "          .-----.          .------------------.         \n                  ");
         Write(0xcccccc, false, ".--'");
         Write(0xe3b585, false, "~ ~ ~");
@@ -49,9 +47,9 @@ internal class SplashScreenImpl : SplashScreen
         Write(0xcccccc, false, "|   3 ");
         Write(0xffff66, false, "**\n           ");
         Write(0xcccccc, false, "|");
-        Write(0x427322, false, "#");
-        Write(0x5eabb4, false, "..");
         Write(0x427322, false, "@");
+        Write(0x5eabb4, false, "..");
+        Write(0x488813, false, "@");
         Write(0xe3b585, false, "'. ~ ");
         Write(0xcc00, false, "\" ' ");
         Write(0xe3b585, false, "~ ");
@@ -68,10 +66,10 @@ internal class SplashScreenImpl : SplashScreen
         Write(0xcccccc, false, "|   4 ");
         Write(0xffff66, false, "**\n           ");
         Write(0xcccccc, false, "|");
-        Write(0x427322, false, "_");
+        Write(0x7fbd39, false, "_");
         Write(0x5eabb4, false, ".~.");
-        Write(0x427322, false, "_");
-        Write(0x4d8b03, false, "@");
+        Write(0x488813, false, "_");
+        Write(0x427322, false, "@");
         Write(0xe3b585, false, "'.. ~ ~ ");
         Write(0xffff66, true, "*");
         Write(0xcccccc, false, "|        | ");
@@ -84,7 +82,10 @@ internal class SplashScreenImpl : SplashScreen
         Write(0xffff66, false, "**\n           ");
         Write(0xcccccc, false, "| ");
         Write(0xffffff, false, "||| ");
-        Write(0x7fbd39, false, "@@  ");
+        Write(0x1461f, false, "@");
+        Write(0x488813, false, "#");
+        Write(0x7fbd39, false, "@");
+        Write(0x488813, false, "#");
         Write(0xe3b585, false, "'''...");
         Write(0xcccccc, false, "|        |");
         Write(0xa25151, false, "...     ");
@@ -95,11 +96,14 @@ internal class SplashScreenImpl : SplashScreen
         Write(0xcccccc, false, "|   6 ");
         Write(0xffff66, false, "**\n           ");
         Write(0xcccccc, false, "|");
-        Write(0x4d8b03, false, "@");
+        Write(0x7fbd39, false, "@");
         Write(0xffffff, false, "~~~");
-        Write(0x488813, false, "@@");
-        Write(0x427322, false, "@ ");
-        Write(0x7fbd39, false, "#      ");
+        Write(0x427322, false, "@");
+        Write(0x488813, false, "@");
+        Write(0x1461f, false, "#");
+        Write(0x7fbd39, false, "#");
+        Write(0x427322, false, "@ @");
+        Write(0x1461f, false, "#   ");
         Write(0xcccccc, false, "|        |");
         Write(0xa5a8af, false, "/\\ ");
         Write(0xa25151, false, "''.  ");
@@ -137,10 +141,11 @@ internal class SplashScreenImpl : SplashScreen
         Write(0x666666, false, "                                             22\n                                                    ");
         Write(0x666666, false, "          23\n                                                              24\n                      ");
         Write(0x666666, false, "                                        25\n           \n");
-
+        
         Console.ForegroundColor = color;
         Console.WriteLine();
     }
 
-    private static void Write(int rgb, bool bold, string text) => Console.Write($"\u001b[38;2;{(rgb >> 16) & 255};{(rgb >> 8) & 255};{rgb & 255}{(bold ? ";1" : "")}m{text}");
+    private static void Write(int rgb, bool bold, string text) =>
+        Console.Write($"\u001b[38;2;{(rgb>>16)&255};{(rgb>>8)&255};{rgb&255}{(bold ? ";1" : "")}m{text}");
 }

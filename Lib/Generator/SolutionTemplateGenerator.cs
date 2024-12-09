@@ -21,5 +21,6 @@ internal class SolutionTemplateGenerator
                 return 0;
             }
         }
+
         """;
 }

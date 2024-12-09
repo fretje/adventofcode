@@ -10,6 +10,6 @@ internal class ReadmeGeneratorForYear
         Check out https://adventofcode.com/{calendar.Year}.
         
         <a href="https://adventofcode.com/{calendar.Year}"><img src="calendar.svg" width="80%" /></a>
-           
+        
         """;
 }

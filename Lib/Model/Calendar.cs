@@ -20,30 +20,29 @@ internal class Calendar
 
     public static Calendar Parse(int year, IDocument document)
     {
-
         var theme = new Dictionary<string[], int>();
 
         // anglesharp bug, it doesn't handle external stylehseets well.
         var q = document.CreateElement("style");
-        q.SetInnerText($@"
-            .calendar > span {{
+        q.SetInnerText($$"""
+            .calendar > span {
                 color: #333333;
-            }}
-            .calendar > a {{
+            }
+            .calendar > a {
                 text-decoration: none;
                 color: #666666;
                 outline: none;
                 cursor: default;
-            }}
+            }
 
-            .calendar .calendar-day {{ color: #666666; }}
-            .calendar a .calendar-day {{ color: #cccccc; }}
+            .calendar .calendar-day { color: #666666; }
+            .calendar a .calendar-day { color: #cccccc; }
             .calendar a .calendar-mark-complete,
-            .calendar a .calendar-mark-verycomplete {{visibility: hidden;}}
+            .calendar a .calendar-mark-verycomplete {visibility: hidden;}
             .calendar a.calendar-complete     .calendar-mark-complete,
-            .calendar a.calendar-verycomplete .calendar-mark-complete {{ visibility: visible; color: #ffff66; }}
-            .calendar a.calendar-verycomplete .calendar-mark-verycomplete {{ visibility: visible; color: #ffff66; }}
-        ");
+            .calendar a.calendar-verycomplete .calendar-mark-complete { visibility: visible; color: #ffff66; }
+            .calendar a.calendar-verycomplete .calendar-mark-verycomplete { visibility: visible; color: #ffff66; }
+            """);
 
         document.Head.Append(q);
 
@@ -185,21 +184,22 @@ internal class Calendar
         var sb = new StringBuilder();
         var height = 0;
         var width = 0;
-        sb.AppendLine($@"
-                <style>
-                    @font-face {{
-                        font-family: ""SourceCodePro"";
-                        src: url(""data:application/font-woff;charset=utf-8;base64,{font}"");
-                    }}
-                    text {{
-                         font-family: SourceCodePro;
-                         font-size: 13.2px;
-                    }}
-                </style>");
-        sb.AppendLine(@"<text xml:space=""preserve"">");
+        sb.AppendLine($$"""
+            <style>
+                @font-face {
+                    font-family: "SourceCodePro";
+                    src: url("data:application/font-woff;charset=utf-8;base64,{{font}}");
+                }
+                text {
+                    font-family: SourceCodePro;
+                    font-size: 13.2px;
+                }
+            </style>
+            """);
+        sb.AppendLine("""<text xml:space="preserve">""");
         foreach (var line in Lines)
         {
-            sb.Append($@"<tspan x=""0"" dy=""1.2em"">");
+            sb.Append($"""<tspan x="0" dy="1.2em">""");
             var lineWidth = 0;
             foreach (var token in line)
             {
@@ -207,7 +207,7 @@ internal class Calendar
                     .Replace("<", "&lt;")
                     .Replace(">", "&gt;")
                     .Replace(" ", "&#160;");
-                sb.Append($@"<tspan fill=""{token.RgbaColor}"">{text}</tspan>");
+                sb.Append($"""<tspan fill="{token.RgbaColor}">{text}</tspan>""");
 
                 lineWidth += token.Text.Length;
             }
@@ -215,9 +215,11 @@ internal class Calendar
             sb.AppendLine("</tspan>");
             height++;
         }
-        sb.AppendLine("</text>");
-        return $@"<svg viewBox=""-16 -16 {(width + 4) * 8} {(height + 2) * 16}"" style=""background-color:black"" xmlns=""http://www.w3.org/2000/svg"">
+        sb.Append("</text>");
+        return $"""
+            <svg viewBox="-16 -16 {(width + 4) * 8} {(height + 2) * 16}" style="background-color:black" xmlns="http://www.w3.org/2000/svg">
             {sb}
-        </svg>";
+            </svg>
+            """;
     }
 }
