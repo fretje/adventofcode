@@ -54,7 +54,7 @@ public static class Helpers
     public static ICollection<ICollection<T>> GetPermutations<T>(this ICollection<T> input, int outputLength)
     {
         Debug.Assert(outputLength > 0);
-        var permutations = input.Select(item => new T[] { item }).ToList();
+        List<T[]> permutations = [.. input.Select(item => (T[])[item])];
         for (var i = 1; i < outputLength; i++)
         {
             List<T[]> newPermutations = [];

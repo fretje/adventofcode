@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode.Y2024.Day07;
+﻿using System.Collections.Concurrent;
+
+namespace AdventOfCode.Y2024.Day07;
 
 [ProblemName("Bridge Repair")]
 internal class Solution : Solver
@@ -9,10 +11,18 @@ internal class Solution : Solver
     public object PartTwo(string[] lines) =>
         SumValidEquations(lines, ['+', '*', '|']);
 
-    private static long SumValidEquations(string[] lines, char[] possibleOperators) => 
-        Parse(lines)
-            .Sum(line => HasValidEquation(line.TestValue, line.Numbers, possibleOperators) 
-                    ? line.TestValue : 0);
+    private static long SumValidEquations(string[] lines, char[] possibleOperators)
+    {
+        ConcurrentBag<long> results = [];
+        Parallel.ForEach(Parse(lines), new() { MaxDegreeOfParallelism = -1 }, line =>
+        {
+            if (HasValidEquation(line.TestValue, line.Numbers, possibleOperators))
+            {
+                results.Add(line.TestValue);
+            }
+        });
+        return results.Sum();
+    }
 
     private static IEnumerable<(long TestValue, long[] Numbers)> Parse(string[] lines) =>
         lines.Select(line =>
