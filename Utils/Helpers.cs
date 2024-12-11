@@ -69,4 +69,52 @@ public static class Helpers
         }
         return [.. permutations];
     }
+
+    public static int NumberOfDigits(this long value)
+    {
+        if (value >= 0)
+        {
+            if (value < 10L) return 1;
+            if (value < 100L) return 2;
+            if (value < 1000L) return 3;
+            if (value < 10000L) return 4;
+            if (value < 100000L) return 5;
+            if (value < 1000000L) return 6;
+            if (value < 10000000L) return 7;
+            if (value < 100000000L) return 8;
+            if (value < 1000000000L) return 9;
+            if (value < 10000000000L) return 10;
+            if (value < 100000000000L) return 11;
+            if (value < 1000000000000L) return 12;
+            if (value < 10000000000000L) return 13;
+            if (value < 100000000000000L) return 14;
+            if (value < 1000000000000000L) return 15;
+            if (value < 10000000000000000L) return 16;
+            if (value < 100000000000000000L) return 17;
+            if (value < 1000000000000000000L) return 18;
+            return 19;
+        }
+        else
+        {
+            if (value > -10L) return 2;
+            if (value > -100L) return 3;
+            if (value > -1000L) return 4;
+            if (value > -10000L) return 5;
+            if (value > -100000L) return 6;
+            if (value > -1000000L) return 7;
+            if (value > -10000000L) return 8;
+            if (value > -100000000L) return 9;
+            if (value > -1000000000L) return 10;
+            if (value > -10000000000L) return 11;
+            if (value > -100000000000L) return 12;
+            if (value > -1000000000000L) return 13;
+            if (value > -10000000000000L) return 14;
+            if (value > -100000000000000L) return 15;
+            if (value > -1000000000000000L) return 16;
+            if (value > -10000000000000000L) return 17;
+            if (value > -100000000000000000L) return 18;
+            if (value > -1000000000000000000L) return 19;
+            return 20;
+        }
+    }
 }
