@@ -17,12 +17,12 @@ class Solution : Solver
             .Sum(s => s.APresses * 3 + s.BPresses);
 
     private static IEnumerable<Claw> ParseInput(string[] lines) => 
-        lines.Chunk(4).Select<string[], Claw>(chunk =>
+        lines.Chunk(4).Select(chunk =>
         {
             var a = chunk[0].Split(": ")[1].Split(", ").Select(x => long.Parse(x.Split('+')[1])).ToArray();
             var b = chunk[1].Split(": ")[1].Split(", ").Select(x => long.Parse(x.Split('+')[1])).ToArray();
             var p = chunk[2].Split(": ")[1].Split(", ").Select(x => long.Parse(x.Split('=')[1])).ToArray();
-            return new(new(a[0], a[1]), new(b[0], b[1]), new(p[0], p[1]));
+            return new Claw(new(a[0], a[1]), new(b[0], b[1]), new(p[0], p[1]));
         });
 
     private static (long APresses, long BPresses)? FindSolutionBruteForce(Claw claw)
