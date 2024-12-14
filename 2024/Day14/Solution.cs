@@ -2,50 +2,42 @@
 
 [ProblemName("Restroom Redoubt")]
 class Solution : Solver 
-{            
+{
+    private const int Width = 101;
+    private const int Height = 103;
+
     public object PartOne(string[] lines) 
     {
         var robots = Parse(lines).ToArray();
 
-        var width = 101;
-        var height = 103;
-
         for (int seconds = 0; seconds < 100; seconds++)
         {
-            robots = robots.Select(r => Move(r, width, height)).ToArray();
+            robots = robots.Select(Move).ToArray();
         }
 
-        var safetyFactor = 0;
-        List<(Pos, Pos)> quadrants = [
-            (new(0, 0),              new(width / 2 - 1, height / 2 - 1)), (new(width / 2 + 1, 0),              new(width - 1, height / 2 - 1)), 
-            (new(0, height / 2 + 1), new(width / 2 - 1, height - 1)),     (new(width / 2 + 1, height / 2 + 1), new(width - 1, height - 1))];
-        foreach (var (start, end) in quadrants)
-        {
-            var count = robots.Count(r => r.Pos.Row >= start.Row && r.Pos.Row <= end.Row && r.Pos.Col >= start.Col && r.Pos.Col <= end.Col);
-            safetyFactor = safetyFactor == 0 ? count : safetyFactor * count;
-            Console.WriteLine($"Quadrant {start} - {end}: {count}");
-        }
+        (Pos Start, Pos End)[] quadrants = [
+            (new(0, 0),              new(Width / 2 - 1, Height / 2 - 1)), (new(Width / 2 + 1, 0),              new(Width - 1, Height / 2 - 1)), 
+            (new(0, Height / 2 + 1), new(Width / 2 - 1, Height - 1)),     (new(Width / 2 + 1, Height / 2 + 1), new(Width - 1, Height - 1))
+        ];
 
-        return safetyFactor;
+        return quadrants
+            .Select(q => robots.Count(r => r.Pos.Row >= q.Start.Row && r.Pos.Row <= q.End.Row 
+                                        && r.Pos.Col >= q.Start.Col && r.Pos.Col <= q.End.Col))
+            .Aggregate(1, (safetyFactor, count) => safetyFactor * count);
     }
 
     public object PartTwo(string[] lines) 
     {
         var robots = Parse(lines).ToArray();
-
-        var width = 101;
-        var height = 103;
-
         int seconds = 0;
         while (true)
         {
-            robots = robots.Select(r => Move(r, width, height)).ToArray();
+            robots = robots.Select(Move).ToArray();
             seconds++;
-            if (Enumerable.Range(0, width).Any(col => robots.Count(robots => robots.Pos.Col == col) > 30)
-                && Enumerable.Range(0, height).Any(row => robots.Count(robots => robots.Pos.Row == row) > 30))
+            if (Enumerable.Range(0, Width).Any(col => robots.Count(robots => robots.Pos.Col == col) > 30)
+                && Enumerable.Range(0, Height).Any(row => robots.Count(robots => robots.Pos.Row == row) > 30))
             {
-                Console.WriteLine("Seconds: " + seconds);
-                Print(robots, width, height);
+                Print(robots);
                 return seconds;
             }
         }
@@ -58,22 +50,21 @@ class Solution : Solver
             return new Robot(new(int.Parse(parts[0]), int.Parse(parts[1])), new(int.Parse(parts[2]), int.Parse(parts[3])));
         });
 
-    private static Robot Move(Robot robot, int gridWidth, int gridHeight) =>
+    private static Robot Move(Robot robot) =>
         robot with
         {
             Pos = new(
-                (((robot.Pos.Col + robot.Vel.Col) % gridWidth) + gridWidth) % gridWidth,
-                (((robot.Pos.Row + robot.Vel.Row) % gridHeight) + gridHeight) % gridHeight)
+                (((robot.Pos.Col + robot.Vel.Col) % Width) + Width) % Width,
+                (((robot.Pos.Row + robot.Vel.Row) % Height) + Height) % Height)
         };
 
-    private static void Print(Robot[] robots, int gridWidth, int gridHeight)
+    private static void Print(Robot[] robots)
     {
-        for (int row = 0; row < gridHeight; row++)
+        for (int row = 0; row < Height; row++)
         {
-            for (int col = 0; col < gridWidth; col++)
+            for (int col = 0; col < Width; col++)
             {
-                var count = robots.Count(r => r.Pos.Row == row && r.Pos.Col == col);
-                if (count > 0)
+                if (robots.Any(r => r.Pos.Row == row && r.Pos.Col == col))
                 {
                     Console.Write("##");
                 }
