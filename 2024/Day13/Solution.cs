@@ -43,14 +43,26 @@ class Solution : Solver
 
     private static (long APresses, long BPresses)? FindSolution(Claw claw)
     {
-        var (a, b, prize) = claw;
-        var aPresses = (double)(prize.X * b.Y - prize.Y * b.X) / (a.X * b.Y - a.Y * b.X);
-        var bPresses = (double)(prize.X - a.X * aPresses) / b.X;
-        if (aPresses % 1 != 0 || bPresses % 1 != 0)
+        var (a, b, p) = claw;
+
+        // na * a.X + nb * b.X = p.X  ==>  nb = (p.X - na * a.X) / b.X
+        // na * a.Y + nb * b.Y = p.Y  ==>  na = (p.Y - nb * b.Y) / a.Y
+
+        // na = (p.Y - ((p.X - na * a.X) / b.X) * b.Y) / a.Y
+        // na = (p.Y - (p.X * b.Y - na * a.X * b.Y) / b.X) / a.Y
+        // na = (p.Y * b.X - p.X * b.Y + na * a.X * b.Y) / (a.Y * b.X)
+        // na * (a.Y * b.X) = p.Y * b.X - p.X * b.Y + na * a.X * b.Y
+        // na * (a.Y * b.X) - na * a.X * b.Y = p.Y * b.X - p.X * b.Y
+        // na * (a.Y * b.X - a.X * b.Y) = p.Y * b.X - p.X * b.Y
+        // na = (p.Y * b.X - p.X * b.Y) / (a.Y * b.X - a.X * b.Y)
+
+        var na = (double)(p.Y * b.X - p.X * b.Y) / (a.Y * b.X - a.X * b.Y);
+        var nb = (double)(p.X - na * a.X) / b.X;
+        if (na % 1 != 0 || nb % 1 != 0)
         {
             return null;
         }
-        return ((long)aPresses, (long)bPresses);
+        return ((long)na, (long)nb);
     }
 
     private record struct Claw(Coords A, Coords B, Coords Prize);
