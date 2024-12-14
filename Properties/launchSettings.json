@@ -2,7 +2,7 @@
   "profiles": {
     "adventofcode": {
       "commandName": "Project",
-      "commandLineArgs": "2024/12",
+      "commandLineArgs": "2024/13",
       "workingDirectory": "$(SolutionDir)\\"
     }
   }
