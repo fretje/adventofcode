@@ -2,8 +2,36 @@
 
 namespace AdventOfCode;
 
-public record struct Pos(int Col, int Row);
+public record struct Pos(int Col, int Row)
+{
+    public static Pos operator +(Pos a, Pos b) => new(a.Col + b.Col, a.Row + b.Row);
+}
 
+public static class Directions
+{
+    public static readonly Pos Up = new(0, -1);
+    public static readonly Pos Down = new(0, 1);
+    public static readonly Pos Left = new(-1, 0);
+    public static readonly Pos Right = new(1, 0);
+    public static readonly Pos[] All = [Right, Down, Left, Up];
+
+    public static Pos FromChar(char c) => c switch
+    {
+        '<' => Left,
+        '>' => Right,
+        '^' => Up,
+        'v' => Down,
+        _ => throw new InvalidOperationException()
+    };
+
+    public static char ToChar(Pos pos) => 
+        pos == Left ? '<' 
+        : pos == Right ? '>' 
+        : pos == Up ? '^' 
+        : pos == Down ? 'v' 
+        : throw new InvalidOperationException();
+}
+    
 public static class Helpers
 {
     public static string ReverseString(this string input) => new([.. input.Reverse()]);
