@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using AngleSharp.Dom;
 
 namespace AdventOfCode.Model;
@@ -98,9 +99,8 @@ internal class Calendar
             }
             var widthSpec = string.IsNullOrEmpty(style["width"]) ?
                 textNode.ParentElement.ParentElement.ComputeCurrentStyle()["width"] : style["width"];
-            if (widthSpec != null)
+            if (textNode.ParentElement.NodeName != "I" && widthSpec != null)
             {
-
                 var m = Regex.Match(widthSpec, "[.0-9]+");
                 if (m.Success)
                 {
