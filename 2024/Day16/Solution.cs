@@ -11,7 +11,7 @@ class Solution : Solver
     {
         var grid = lines.ToGrid();
         var start = grid.AllCells().First(c => c.Value == 'S').Pos;
-        var startDir = Directions.Left;
+        var startDir = Directions.Right;
         var end = grid.AllCells().First(c => c.Value == 'E').Pos;
 
         List<(long Price, HashSet<Pos> Path)> solutions = [];
