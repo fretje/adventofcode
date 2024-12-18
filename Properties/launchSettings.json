@@ -2,7 +2,7 @@
   "profiles": {
     "adventofcode": {
       "commandName": "Project",
-      "commandLineArgs": "update 2024/16",
+      "commandLineArgs": "2024/17",
       "workingDirectory": "$(SolutionDir)\\",
       "environmentVariables": {
         "SESSION": "53616c7465645f5f1288c16e5f8d3feb7d64f98cc69d35b0252b0d03681023ca45d7623bac081d4c41014b2073bf591f4300db8e4de4d52936f6329365c37758"
