@@ -37,7 +37,7 @@ class Solution : Solver
             if (Enumerable.Range(0, Width).Any(col => robots.Count(robots => robots.Pos.Col == col) > 30)
                 && Enumerable.Range(0, Height).Any(row => robots.Count(robots => robots.Pos.Row == row) > 30))
             {
-                Print(robots);
+                //Print(robots);
                 return seconds;
             }
         }
