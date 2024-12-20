@@ -18,34 +18,33 @@ class Solution : Solver
     {
         var distances = ParseInput(lines);
         var count = 0;
-        foreach (var start in distances)
+        Parallel.ForEach(distances, start =>
         {
             foreach (var end in distances)
             {
                 var distanceFromStart = Math.Abs(end.Key.Col - start.Key.Col) + Math.Abs(end.Key.Row - start.Key.Row);
-                var timeSaved = start.Value - end.Value - distanceFromStart;
-                if (distanceFromStart <= 20 && timeSaved >= 100)
+                if (distanceFromStart <= 20 && start.Value - end.Value - distanceFromStart >= 100)
                 {
-                    count++;
+                    Interlocked.Increment(ref count);
                 }
             }
-        }
+        });
         return count;
     }
 
     private static Dictionary<Pos, int> ParseInput(string[] lines)
     {
         var grid = lines.ToGrid();
-        var start = grid.AllCells().Single(c => c.Value == 'S').Pos;
-        var end = grid.AllCells().Single(c => c.Value == 'E').Pos;
-        var curPos = start;
+        var startPos = grid.AllCells().Single(c => c.Value == 'S').Pos;
+        var endPos = grid.AllCells().Single(c => c.Value == 'E').Pos;
+        var curPos = startPos;
         Dictionary<Pos, int> distances = [];
         distances[curPos] = 0;
-        while (curPos != end)
+        while (curPos != endPos)
         {
             var nextPos = Directions.All
-                .Select(d => curPos + d)
-                .Single(p => grid.Contains(p) && grid.ValueAt(p) != '#' && !distances.ContainsKey(p));
+                .Select(dir => curPos + dir)
+                .Single(pos => grid.Contains(pos) && grid.ValueAt(pos) != '#' && !distances.ContainsKey(pos));
             distances[nextPos] = distances[curPos] + 1;
             curPos = nextPos;
         }
