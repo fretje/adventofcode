@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode.Y2024.Day22;
+﻿using System.Collections.Concurrent;
+
+namespace AdventOfCode.Y2024.Day22;
 
 [ProblemName("Monkey Market")]
 class Solution : Solver 
@@ -18,10 +20,9 @@ class Solution : Solver
 
     public object PartTwo(string[] lines) 
     {
-        Dictionary<(int, int, int, int), long> seqOf4DiffsTotal = [];
-        foreach (var n in lines.Select(long.Parse))
+        ConcurrentDictionary<(int, int, int, int), long> seqOf4DiffsTotal = [];
+        Parallel.ForEach(lines.Select(long.Parse), number =>
         {
-            var number = n;
             List<int> prices = [(int)number % 10];
             for (var i = 1; i <= 2000; i++)
             {
@@ -35,14 +36,10 @@ class Solution : Solver
                 var seqOf4Diffs = (differences[i], differences[i + 1], differences[i + 2], differences[i + 3]);
                 if (seen.Add(seqOf4Diffs))
                 {
-                    if (!seqOf4DiffsTotal.ContainsKey(seqOf4Diffs))
-                    {
-                        seqOf4DiffsTotal[seqOf4Diffs] = 0;
-                    }
-                    seqOf4DiffsTotal[seqOf4Diffs] += prices[i + 4];
+                    seqOf4DiffsTotal.AddOrUpdate(seqOf4Diffs, prices[i + 4], (_, v) => v + prices[i + 4]);
                 }
             }
-        }
+        });
         return seqOf4DiffsTotal.Values.Max();
     }
 
