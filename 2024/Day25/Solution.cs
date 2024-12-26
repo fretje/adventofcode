@@ -34,11 +34,8 @@ class Solution : Solver
         return count;
     }
 
-    private bool KeyFitsLock(int[] key, int[] @lock) =>
+    private static bool KeyFitsLock(int[] key, int[] @lock) =>
         key.Zip(@lock).All(pair => pair.First + pair.Second <= 7);
 
-    public object PartTwo(string[] lines) 
-    {
-        return 0;
-    }
+    public object PartTwo(string[] lines) => 0;
 }
