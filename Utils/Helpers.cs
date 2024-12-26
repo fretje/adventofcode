@@ -68,6 +68,17 @@ public static class Helpers
     public static T[][] DeepClone<T>(this T[][] grid) =>
         grid.Select(r => r.ToArray()).ToArray();
 
+    public static IEnumerable<IEnumerable<T>> CartesianProduct<T>(this IEnumerable<IEnumerable<T>> sequences)
+    {
+        IEnumerable<IEnumerable<T>> emptyProduct = [[]];
+        return sequences.Aggregate(
+            emptyProduct,
+            (accumulator, sequence) =>
+                from accseq in accumulator
+                from item in sequence
+                select accseq.Concat([item]));
+    }
+
     public static IEnumerable<(T, T)> GetCombinations<T>(this ICollection<T> input)
     {
         for (var i = 0; i < input.Count; i++)
