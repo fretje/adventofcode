@@ -53,7 +53,7 @@ static class Extensions
         while (queue.Count != 0)
         {
             var (pos, steps) = queue.Dequeue();
-            foreach (var dir in Directions.All)
+            foreach (var dir in Directions.Othogonal)
             {
                 var next = pos + dir;
                 if (!grid.Contains(next) || grid.ValueAt(next) == '#' || seen.Contains(next))

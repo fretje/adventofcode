@@ -65,7 +65,7 @@ internal class Solution : Solver
         var nextPos = current.Pos + current.Dir;
         return grid.Contains(nextPos)
             ? grid.ValueAt(nextPos) == '#'
-                ? NextGuardPos((current.Pos, Directions.Next(current.Dir)), grid)
+                ? NextGuardPos((current.Pos, Directions.TurnRight(current.Dir)), grid)
                 : (nextPos, current.Dir)
             : null;
     }

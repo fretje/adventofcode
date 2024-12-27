@@ -36,7 +36,7 @@ public static class Extensions
             HashSet<Pos> newNext = [];
             foreach (var p in next)
             {
-                foreach (var d in Directions.All)
+                foreach (var d in Directions.Othogonal)
                 {
                     var newPos = p + d;
                     if (!region.Contains(newPos) && grid.Contains(newPos) && grid.ValueAt(newPos) == grid.ValueAt(pos))
@@ -60,10 +60,9 @@ public static class Extensions
     {
         foreach (var pos in region)
         {
-            foreach (var dir in Directions.All)
+            foreach (var dir in Directions.Othogonal)
             {
-                var newPos = pos + dir;
-                if (!region.Contains(newPos))
+                if (!region.Contains(pos + dir))
                 {
                     yield return (pos, dir);
                 }

@@ -41,7 +41,7 @@ class Solution : Solver
         distances[curPos] = 0;
         while (curPos != endPos)
         {
-            var nextPos = Directions.All
+            var nextPos = Directions.Othogonal
                 .Select(dir => curPos + dir)
                 .Single(pos => grid.Contains(pos) && grid.ValueAt(pos) != '#' && !distances.ContainsKey(pos));
             distances[nextPos] = distances[curPos] + 1;

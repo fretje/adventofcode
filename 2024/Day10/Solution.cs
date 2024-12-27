@@ -34,7 +34,7 @@ class Solution : Solver
             return 1;
         }
 
-        return Directions.All
+        return Directions.Othogonal
             .Where(dir => grid.ValueAt(pos, dir) == value + 1)
             .Sum(dir => CalculateScore(pos + dir, grid, part2, visited));
     }

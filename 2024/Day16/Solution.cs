@@ -10,70 +10,79 @@ class Solution : Solver
     private static long Solve(string[] lines, bool part2 = false)
     {
         var grid = lines.ToGrid();
-        var start = grid.AllCells().First(c => c.Value == 'S').Pos;
-        var startDir = Directions.Right;
-        var end = grid.AllCells().First(c => c.Value == 'E').Pos;
+        Pose start = new(grid.AllCells().First(c => c.Value == 'S').Pos, Directions.Right);
+        Pos end = grid.AllCells().First(c => c.Value == 'E').Pos;
 
-        List<(long Price, HashSet<Pos> Path)> solutions = [];
-        Queue<(Pos Pos, Pos Dir, long Price, HashSet<Pos> Path)> queue = [];
-        Dictionary<(Pos, Pos), long> seen = [];
+        PriorityQueue<(Pose, long), long> pQueue = new();
+        Dictionary<Pose, long> minPrices = [];
+        long minimumPrice = long.MaxValue;
+        Dictionary<Pose, HashSet<Pose>> backTrack = [];
+        HashSet<Pose> endPoses = [];
 
-        queue.Enqueue((start, startDir, 0, part2 ? [start] : []));
-        seen[(start, startDir)] = 0;
-        while (queue.Count != 0)
+        pQueue.Enqueue((start, 0), 0);
+        minPrices[start] = 0;
+        while (pQueue.Count != 0)
         {
-            var (pos, dir, price, path) = queue.Dequeue();
-            if (!grid.Contains(pos) || grid.ValueAt(pos) == '#')
+            var (pose, price) = pQueue.Dequeue();
+            if (minPrices.TryGetValue(pose, out var minPrice) && price > minPrice)
             {
                 continue;
             }
-            if (pos == end)
+            if (pose.Pos == end)
             {
-                solutions.Add((price, path));
-                continue;
+                if (price > minimumPrice)
+                {
+                    break;
+                }
+                minimumPrice = price;
+                endPoses.Add(pose);
+                if (!part2) break;
             }
-            TryEnqueue(pos + dir, dir, price + 1, part2 ? [.. path, pos + dir] : path);
-            TryEnqueue(pos, GetDirectionAfterTurn(dir, Directions.Left), price + 1000, path);
-            TryEnqueue(pos, GetDirectionAfterTurn(dir, Directions.Right), price + 1000, path);
+            TryEnqueue(pose.Move(), price + 1);
+            TryEnqueue(pose.TurnLeft(), price + 1000);
+            TryEnqueue(pose.TurnRight(), price + 1000);
 
-            void TryEnqueue(Pos pos, Pos dir, long price, HashSet<Pos> path)
+            void TryEnqueue(Pose newPose, long newPrice)
             {
-                if (seen.TryGetValue((pos, dir), out var seenPrice) && (part2 ? seenPrice < price : seenPrice <= price))
+                if (grid.ValueAt(newPose.Pos) == '#')
                 {
                     return;
                 }
-                seen[(pos, dir)] = price;
-                queue.Enqueue((pos, dir, price, path));
+                var minPrice = minPrices.GetValueOrDefault(newPose, long.MaxValue);
+                if (part2 ? newPrice > minPrice : newPrice >= minPrice)
+                {
+                    return;
+                }
+                if (newPrice < minPrice)
+                {
+                    minPrices[newPose] = newPrice;
+                    backTrack[newPose] = [];
+                }
+                backTrack[newPose].Add(pose);
+                pQueue.Enqueue((newPose, newPrice), newPrice);
             }
         }
 
-        var min = solutions.Min(s => s.Price);
         if (!part2)
         {
-            return min;
+            return minimumPrice;
         }
 
-        return solutions.Where(s => s.Price == min).SelectMany(s => s.Path).Distinct().Count();
-    }
-
-    private static Pos GetDirectionAfterTurn(Pos currentDirection, Pos turn)
-    {
-        if (currentDirection == Directions.Left)
+        Queue<Pose> queue = new(endPoses);
+        while (queue.Count > 0)
         {
-            return turn == Directions.Left ? Directions.Down : Directions.Up;
+            var current = queue.Dequeue();
+            if (backTrack.TryGetValue(current, out var previousPoses))
+            {
+                foreach (var previous in previousPoses)
+                {
+                    if (endPoses.Add(previous))
+                    {
+                        queue.Enqueue(previous);                    
+                    }
+                }
+            }
         }
-        if (currentDirection == Directions.Right)
-        {
-            return turn == Directions.Left ? Directions.Up : Directions.Down;
-        }
-        if (currentDirection == Directions.Up)
-        {
-            return turn == Directions.Left ? Directions.Left : Directions.Right;
-        }
-        if (currentDirection == Directions.Down)
-        {
-            return turn == Directions.Left ? Directions.Right : Directions.Left;
-        }
-        throw new InvalidOperationException();
+        return endPoses.Select(x => x.Pos).ToHashSet().Count;
     }
 }
