@@ -18,13 +18,11 @@ class Solution : Solver
             var gate2 = gates.Single(g => g.Output.Name == b);
             (gate1.Output, gate2.Output) = (gate2.Output, gate1.Output);
         }
-
         foreach (var wire in wires.Values)
         {
             wire.In = gates.Where(g => g.Output == wire).SingleOrDefault();
             wire.Outs = [.. gates.Where(g => g.Input1 == wire || g.Input2 == wire)];
         }
-
         foreach (var bit in Enumerable.Range(0, 45))
         {
             foreach (var wire in wires)
@@ -69,13 +67,11 @@ class Solution : Solver
             gates.Add(new Gate(gateId, gateParts[1], GetWire(gateParts[0]), GetWire(gateParts[2]), GetWire(gateParts[4])));
             gateId++;
         }
-
         foreach (var wire in wires)
         {
             wire.In = gates.Where(g => g.Output == wire).SingleOrDefault();
             wire.Outs = [.. gates.Where(g => g.Input1 == wire || g.Input2 == wire)];
         }
-
         return gates;
 
         Wire GetWire(string name)
