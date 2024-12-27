@@ -1,52 +1,28 @@
-﻿using System.Collections.Concurrent;
-
-namespace AdventOfCode.Y2024.Day07;
+﻿namespace AdventOfCode.Y2024.Day07;
 
 [ProblemName("Bridge Repair")]
 internal class Solution : Solver
 {
-    public object PartOne(string[] lines) => SumValidEquations(lines, ['+', '*']);
+    public object PartOne(string[] lines) => SumValidEquations(lines);
 
-    public object PartTwo(string[] lines) => SumValidEquations(lines, ['+', '*', '|']);
+    public object PartTwo(string[] lines) => SumValidEquations(lines, true);
 
-    private static long SumValidEquations(string[] lines, char[] possibleOperators)
-    {
-        ConcurrentBag<long> results = [];
-        Parallel.ForEach(Parse(lines), line =>
-        {
-            if (HasValidEquation(line.TestValue, line.Numbers, possibleOperators))
+    private static long SumValidEquations(string[] lines, bool part2 = false) =>
+        lines
+            .Select(line =>
             {
-                results.Add(line.TestValue);
-            }
-        });
-        return results.Sum();
-    }
+                var parts = line.Split(": ");
+                return (Expected: long.Parse(parts[0]), Numbers: parts[1].Split(' ').Select(long.Parse).ToArray());
+            })
+            .Where(x => IsValidEquation(x.Expected, x.Numbers, part2))
+            .Sum(x => x.Expected);
 
-    private static IEnumerable<(long TestValue, long[] Numbers)> Parse(string[] lines) =>
-        lines.Select(line =>
-        {
-            var parts = line.Split(": ");
-            return (long.Parse(parts[0]), parts[1].Split(' ').Select(long.Parse).ToArray());
-        });
-
-    private static bool HasValidEquation(long testValue, long[] numbers, char[] possibleOperators) =>
-        possibleOperators.GetPermutations(numbers.Length - 1)
-            .Any(operators => Calculate(numbers, operators) == testValue);
-
-    private static long Calculate(long[] numbers, ICollection<char> operators)
-    {
-        var result = numbers[0];
-        for (int i = 0; i < operators.Count; i++)
-        {
-            var number = numbers[i + 1];
-            result = operators.ElementAt(i) switch
-            {
-                '+' => result + number,
-                '*' => result * number,
-                '|' => long.Parse($"{result}{number}"),
-                _ => throw new InvalidOperationException()
-            };
-        }
-        return result;
-    }
+    private static bool IsValidEquation(long expected, long[] numbers, bool part2 = false) =>
+        numbers.Length == 1
+            ? numbers[0] == expected
+            : expected % numbers[^1] == 0 && IsValidEquation(expected / numbers[^1], numbers[0..^1], part2)
+                || (expected > numbers[^1] && IsValidEquation(expected - numbers[^1], numbers[0..^1], part2))
+                || part2 && expected.ToString() is { } expectedStr && numbers[^1].ToString() is { } numberStr
+                    && expectedStr.Length > numberStr.Length && expectedStr.EndsWith(numberStr)
+                    && IsValidEquation(long.Parse(expectedStr[..^numberStr.Length]), numbers[0..^1], part2);
 }
