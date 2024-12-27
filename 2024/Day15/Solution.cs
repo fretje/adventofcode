@@ -31,7 +31,7 @@ class Solution : Solver
                     readingGrid = false;
                     continue;
                 }
-                grid.Add((part2 
+                grid.Add(part2 
                     ?  [.. line.ToCharArray().SelectMany((c) => c switch
                         {
                             '#' => (char[])['#', '#'],
@@ -40,7 +40,7 @@ class Solution : Solver
                             '@' => ['@', '.'],
                             _ => throw new InvalidOperationException(),
                         })] 
-                    : line.ToCharArray()));
+                    : line.ToCharArray());
                 continue;
             }
             moves.AddRange(line.ToCharArray().Select(Directions.FromChar));

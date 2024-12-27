@@ -32,27 +32,23 @@ class Solution : Solver
     public object PartTwo(string[] lines) =>
         lines[0].Split(' ').Select(long.Parse).Sum(i => StoneCountAfter(i, 75));
 
-    private readonly Dictionary<(long, int), long> _cachedResults = [];
+    private readonly Dictionary<(long, int), long> _memo = [];
 
     public long StoneCountAfter(long value, int generations)
     {
-        if (_cachedResults.TryGetValue((value, generations), out var result))
+        if (!_memo.TryGetValue((value, generations), out var result))
         {
-            return result;
+            result = (value, generations) switch
+            {
+                (_, 0) => 1,
+                (0, _) => StoneCountAfter(1, generations - 1),
+                _ when value.NumberOfDigits() % 2 == 0 && value.ToString() is { } str =>
+                    StoneCountAfter(long.Parse(str[0..(str.Length / 2)]), generations - 1)
+                    + StoneCountAfter(long.Parse(str[(str.Length / 2)..]), generations - 1),
+                _ => StoneCountAfter(value * 2024, generations - 1)
+            };
+            _memo[(value, generations)] = result;
         }
-
-        result = (value, generations) switch
-        {
-            (_, 0) => 1,
-            (0, _) => StoneCountAfter(1, generations - 1),
-            _ when value.NumberOfDigits() % 2 == 0 && value.ToString() is { } str =>
-                StoneCountAfter(long.Parse(str[0..(str.Length / 2)]), generations - 1)
-                + StoneCountAfter(long.Parse(str[(str.Length / 2)..]), generations - 1),
-            _ => StoneCountAfter(value * 2024, generations - 1)
-        };
-
-        _cachedResults[(value, generations)] = result;
-
         return result;
     }
 }

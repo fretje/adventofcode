@@ -20,9 +20,9 @@ internal class Solution : Solver
     private static bool IsValidEquation(long expected, long[] numbers, bool part2 = false) =>
         numbers.Length == 1
             ? numbers[0] == expected
-            : expected % numbers[^1] == 0 && IsValidEquation(expected / numbers[^1], numbers[0..^1], part2)
+            : (expected % numbers[^1] == 0 && IsValidEquation(expected / numbers[^1], numbers[0..^1], part2))
                 || (expected > numbers[^1] && IsValidEquation(expected - numbers[^1], numbers[0..^1], part2))
-                || part2 && expected.ToString() is { } expectedStr && numbers[^1].ToString() is { } numberStr
+                || (part2 && expected.ToString() is { } expectedStr && numbers[^1].ToString() is { } numberStr
                     && expectedStr.Length > numberStr.Length && expectedStr.EndsWith(numberStr)
-                    && IsValidEquation(long.Parse(expectedStr[..^numberStr.Length]), numbers[0..^1], part2);
+                    && IsValidEquation(long.Parse(expectedStr[..^numberStr.Length]), numbers[0..^1], part2));
 }

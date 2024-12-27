@@ -16,26 +16,24 @@ class Solution : Solver
     private static int[][] ParseGrid(string[] lines) => 
         lines.Select(line => line.Select(ch => ch == '.' ? -1 : int.Parse([ch])).ToArray()).ToArray();
 
-    private static int CalculateScore(Pos pos, int[][] grid, bool part2 = false, HashSet<Pos>? visited = null)
+    private static int CalculateScore(Pos pos, int[][] grid, bool part2 = false, HashSet<Pos>? seen = null)
     {
         if (!part2)
         {
-            visited ??= [];
-            if (!grid.Contains(pos) || visited.Contains(pos))
+            seen ??= [];
+            if (!grid.Contains(pos) || seen.Contains(pos))
             {
                 return 0;
             }
-            visited.Add(pos);
+            seen.Add(pos);
         }
-
         var value = grid.ValueAt(pos);
         if (value == 9)
         {
             return 1;
         }
-
         return Directions.Othogonal
             .Where(dir => grid.ValueAt(pos, dir) == value + 1)
-            .Sum(dir => CalculateScore(pos + dir, grid, part2, visited));
+            .Sum(dir => CalculateScore(pos + dir, grid, part2, seen));
     }
 }

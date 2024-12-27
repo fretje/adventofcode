@@ -22,7 +22,6 @@ class Solution : Solver
     public object PartTwo(string[] lines)
     {
         var blocks = GetBlocks(lines[0]);
-
         Dictionary<int, List<int>> files = []; // maps file index to block indexes
         List<(int BlockIndex, int Size)> gaps = [];
         for (int blockIndex = 0; blockIndex < blocks.Count; blockIndex++)
@@ -46,7 +45,6 @@ class Solution : Solver
                 gaps.Add((gapBlockIndex, blockIndex - gapBlockIndex + 1));
             }
         }
-
         foreach (var fileIndex in files.Keys.OrderDescending())
         {
             var fileBlocks = files[fileIndex];
@@ -65,7 +63,6 @@ class Solution : Solver
                 }
             }
         }
-
         return CalculateChecksum(blocks);
     }
 
