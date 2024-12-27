@@ -5,16 +5,14 @@ namespace AdventOfCode.Y2024.Day07;
 [ProblemName("Bridge Repair")]
 internal class Solution : Solver
 {
-    public object PartOne(string[] lines) =>
-        SumValidEquations(lines, ['+', '*']);
+    public object PartOne(string[] lines) => SumValidEquations(lines, ['+', '*']);
 
-    public object PartTwo(string[] lines) =>
-        SumValidEquations(lines, ['+', '*', '|']);
+    public object PartTwo(string[] lines) => SumValidEquations(lines, ['+', '*', '|']);
 
     private static long SumValidEquations(string[] lines, char[] possibleOperators)
     {
         ConcurrentBag<long> results = [];
-        Parallel.ForEach(Parse(lines), new() { MaxDegreeOfParallelism = -1 }, line =>
+        Parallel.ForEach(Parse(lines), line =>
         {
             if (HasValidEquation(line.TestValue, line.Numbers, possibleOperators))
             {
@@ -40,12 +38,12 @@ internal class Solution : Solver
         var result = numbers[0];
         for (int i = 0; i < operators.Count; i++)
         {
-            var num = numbers[i + 1];
+            var number = numbers[i + 1];
             result = operators.ElementAt(i) switch
             {
-                '+' => result + num,
-                '*' => result * num,
-                '|' => long.Parse($"{result}{num}"),
+                '+' => result + number,
+                '*' => result * number,
+                '|' => long.Parse($"{result}{number}"),
                 _ => throw new InvalidOperationException()
             };
         }

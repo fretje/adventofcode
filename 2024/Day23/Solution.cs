@@ -14,7 +14,7 @@ class Solution : Solver
             .Count();
     }
 
-    public object PartTwo(string[] lines) => string.Join(",", GetMaxClique(ParseInput(lines)).Order());
+    public object PartTwo(string[] lines) => string.Join(",", ParseInput(lines).GetMaxClique().Order());
 
     private static Dictionary<string, HashSet<string>> ParseInput(string[] lines)
     {
@@ -37,28 +37,5 @@ class Solution : Solver
             bConnections.Add(a);
         }
         return graph;
-    }
-
-    private static HashSet<string> GetMaxClique(Dictionary<string, HashSet<string>> graph) =>
-        BronKerbosch([], [.. graph.Keys], [], graph).OrderByDescending(c => c.Count).First();
-
-    private static HashSet<HashSet<string>> BronKerbosch(HashSet<string> R, HashSet<string> P, HashSet<string> X, Dictionary<string, HashSet<string>> graph)
-    {
-        HashSet<HashSet<string>> cliques = [];
-        if (P.Count == 0 && X.Count == 0)
-        {
-            cliques.Add(new(R));
-        }
-        while (P.Count != 0)
-        {
-            var v = P.First();
-            HashSet<string> newR = new(R) { v };
-            HashSet<string> newP = new(P.Where(x => graph[v].Contains(x)).ToHashSet());
-            HashSet<string> newX = new(X.Where(x => graph[v].Contains(x)).ToHashSet());
-            cliques.UnionWith(BronKerbosch(newR, newP, newX, graph));
-            P.Remove(v);
-            X.Add(v);
-        }
-        return cliques;
     }
 }

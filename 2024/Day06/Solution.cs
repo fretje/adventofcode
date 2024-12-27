@@ -3,8 +3,6 @@
 [ProblemName("Guard Gallivant")]
 internal class Solution : Solver
 {
-    private static char[] _guardChars = ['^', '>', 'v', '<'];
-
     public object PartOne(string[] lines)
     {
         var grid = lines.ToGrid();
@@ -17,35 +15,31 @@ internal class Solution : Solver
         return GetObstructionsWithLoopCount(grid, GetGuard(grid));
     }
 
-    private static (char Value, Pos Pos) GetGuard(char[][] grid) =>
-        grid.AllCells().First(c => _guardChars.Contains(c.Value));
+    private static (Pos Pos, Pos Dir) GetGuard(char[][] grid) =>
+        (grid.AllCells().First(c => c.Value == '^').Pos, Directions.Up);
 
-    private static Pos[] GetDistinctPositions(char[][] grid, (char Value, Pos Pos) guard) =>
+    private static Pos[] GetDistinctPositions(char[][] grid, (Pos Pos, Pos Dir) guard) =>
         [.. WalkGuard(guard, grid).Select(p => p.Pos).Distinct()];
 
-    private static int GetObstructionsWithLoopCount(char[][] grid, (char Value, Pos Pos) guard)
+    private static int GetObstructionsWithLoopCount(char[][] grid, (Pos Pos, Pos Dir) guard)
     {
         var distinctPositions = GetDistinctPositions(grid, guard);
         var obstructionsWithLoopCount = 0;
-        Parallel.For(0, distinctPositions.Length, i =>
+        Parallel.ForEach(distinctPositions.Where(pos => pos != guard.Pos), pos =>
         {
-            var pos = distinctPositions[i];
-            if (pos != guard.Pos)
+            var newGrid = grid.DeepClone();
+            newGrid.SetValueAt(pos, '#');
+            if (HasLoop(newGrid, guard))
             {
-                var newGrid = grid.DeepClone();
-                newGrid.SetValueAt(pos, '#');
-                if (HasLoop(newGrid, guard))
-                {
-                    Interlocked.Increment(ref obstructionsWithLoopCount);
-                }
+                Interlocked.Increment(ref obstructionsWithLoopCount);
             }
         });
         return obstructionsWithLoopCount;
     }
 
-    private static bool HasLoop(char[][] grid, (char Direction, Pos Pos) guard)
+    private static bool HasLoop(char[][] grid, (Pos Pos, Pos Dir) guard)
     {
-        HashSet<(char, Pos)> visited = [];
+        HashSet<(Pos, Pos)> visited = [];
         foreach (var pos in WalkGuard(guard, grid))
         {
             if (!visited.Add(pos))
@@ -56,7 +50,7 @@ internal class Solution : Solver
         return false;
     }
 
-    private static IEnumerable<(char Direction, Pos Pos)> WalkGuard((char Direction, Pos Pos) current, char[][] grid)
+    private static IEnumerable<(Pos Pos, Pos Dir)> WalkGuard((Pos Pos, Pos Dir) current, char[][] grid)
     {
         yield return current;
         while (NextGuardPos(current, grid) is { } next)
@@ -66,33 +60,13 @@ internal class Solution : Solver
         }
     }
 
-    private static (char Direction, Pos Pos)? NextGuardPos((char Direction, Pos Pos) current, char[][] grid)
+    private static (Pos Pos, Pos Dir)? NextGuardPos((Pos Pos, Pos Dir) current, char[][] grid)
     {
-        var nextPos = NextPos(current);
+        var nextPos = current.Pos + current.Dir;
         return grid.Contains(nextPos)
             ? grid.ValueAt(nextPos) == '#'
-                ? NextGuardPos((NextDirection(current.Direction), current.Pos), grid)
-                : (current.Direction, nextPos)
+                ? NextGuardPos((current.Pos, Directions.Next(current.Dir)), grid)
+                : (nextPos, current.Dir)
             : null;
     }
-
-    private static Pos NextPos((char Direction, Pos Pos) current) =>
-        current.Direction switch
-        {
-            '^' => new Pos(current.Pos.Col, current.Pos.Row - 1),
-            '>' => new Pos(current.Pos.Col + 1, current.Pos.Row),
-            'v' => new Pos(current.Pos.Col, current.Pos.Row + 1),
-            '<' => new Pos(current.Pos.Col - 1, current.Pos.Row),
-            _ => throw new Exception("Invalid direction")
-        };
-
-    private static char NextDirection(char direction) =>
-        direction switch
-        {
-            '^' => '>',
-            '>' => 'v',
-            'v' => '<',
-            '<' => '^',
-            _ => throw new Exception("Invalid direction")
-        };
 }

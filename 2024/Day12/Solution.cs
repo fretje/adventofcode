@@ -36,9 +36,9 @@ public static class Extensions
             HashSet<Pos> newNext = [];
             foreach (var p in next)
             {
-                foreach (var d in _directions)
+                foreach (var d in Directions.All)
                 {
-                    var newPos = new Pos(p.Col + d.Col, p.Row + d.Row);
+                    var newPos = p + d;
                     if (!region.Contains(newPos) && grid.Contains(newPos) && grid.ValueAt(newPos) == grid.ValueAt(pos))
                     {
                         newNext.Add(newPos);
@@ -60,9 +60,9 @@ public static class Extensions
     {
         foreach (var pos in region)
         {
-            foreach (var dir in _directions)
+            foreach (var dir in Directions.All)
             {
-                var newPos = new Pos(pos.Col + dir.Col, pos.Row + dir.Row);
+                var newPos = pos + dir;
                 if (!region.Contains(newPos))
                 {
                     yield return (pos, dir);
@@ -73,28 +73,21 @@ public static class Extensions
 
     public static int GetSides(this HashSet<Pos> region)
     {
-        var perimeters = GetPerimeters(region).GroupBy(per => per.Dir)
-            .ToDictionary(per => per.Key, per => per.Select(p => p.Pos)
-                                                    .OrderBy(p => per.Key == new Pos(1, 0) || per.Key == new Pos(-1, 0) ? p.Row : p.Col).ToList());
-        foreach (var (dir, pers) in perimeters)
+        var perimetersPerDirection = GetPerimeters(region).GroupBy(per => per.Dir).ToDictionary(
+            perimeters => perimeters.Key, 
+            perimeters => perimeters.Select(per => per.Pos)
+                .OrderBy(pos => perimeters.Key == Directions.Left || perimeters.Key == Directions.Right ? pos.Row : pos.Col).ToList());
+        foreach (var (dir, perimeters) in perimetersPerDirection)
         {
-            var nextDir = dir == new Pos(1, 0) || dir == new Pos(-1, 0) ? new Pos(0, -1) : new Pos(-1, 0);
-            for (int i = pers.Count - 1; i >= 0; i--)
+            var nextDir = dir == Directions.Left || dir == Directions.Right ? Directions.Up : Directions.Left;
+            for (int i = perimeters.Count - 1; i >= 0; i--)
             {
-                var per = pers[i];
-                if (pers.Contains(new Pos(per.Col + nextDir.Col, per.Row + nextDir.Row)))
+                if (perimeters.Contains(perimeters[i] + nextDir))
                 {
-                    pers.RemoveAt(i);
+                    perimeters.RemoveAt(i);
                 }
             }
         }
-        return perimeters.Values.Sum(p => p.Count);
+        return perimetersPerDirection.Values.Sum(per => per.Count);
     }
-
-    private static readonly Pos[] _directions = [
-        new Pos(1, 0), // right
-        new Pos(0, 1), // down
-        new Pos(-1, 0), // left
-        new Pos(0, -1), // up
-    ];
 }

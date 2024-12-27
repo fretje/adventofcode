@@ -3,11 +3,9 @@
 [ProblemName("Mull It Over")]
 internal partial class Solution : Solver
 {
-    public object PartOne(string[] lines) =>
-        lines.Sum(GetMultiplications);
+    public object PartOne(string[] lines) => lines.Sum(GetMultiplications);
 
-    public object PartTwo(string[] lines) =>
-        GetMultiplications2(string.Join("", lines));
+    public object PartTwo(string[] lines) => GetMultiplications2(string.Join("", lines));
 
     private static int GetMultiplications(string line) =>
         MulRegex().Matches(line).AsEnumerable()

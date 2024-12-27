@@ -29,16 +29,13 @@ internal class Solution : Solver
                 readingRules = false;
                 continue;
             }
-
             if (readingRules)
             {
                 var parts = line.Split("|");
                 rules.Add((int.Parse(parts[0]), int.Parse(parts[1])));
+                continue;
             }
-            else
-            {
-                pagesList.Add(line.Split(',').Select(int.Parse).ToArray());
-            }
+            pagesList.Add(line.Split(',').Select(int.Parse).ToArray());
         }
         return (rules, pagesList);
     }

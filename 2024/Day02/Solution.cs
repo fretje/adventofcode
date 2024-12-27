@@ -3,11 +3,9 @@
 [ProblemName("Red-Nosed Reports")]
 internal class Solution : Solver
 {
-    public object PartOne(string[] lines) =>
-        Parse(lines).Count(IsSafe);
+    public object PartOne(string[] lines) => Parse(lines).Count(IsSafe);
 
-    public object PartTwo(string[] lines) =>
-        Parse(lines).Count(IsSafeWithDampener);
+    public object PartTwo(string[] lines) => Parse(lines).Count(IsSafeWithDampener);
 
     private static IEnumerable<int[]> Parse(string[] lines) =>
         lines.Select(line => line.Split(' ').Select(int.Parse).ToArray());

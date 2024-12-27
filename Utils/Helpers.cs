@@ -30,8 +30,15 @@ public static class Directions
         : pos == Up ? '^' 
         : pos == Down ? 'v' 
         : throw new InvalidOperationException();
+
+    public static Pos Next(Pos direction) =>
+        direction == Up ? Right
+        : direction == Right ? Down
+        : direction == Down ? Left
+        : direction == Left ? Up
+        : throw new InvalidOperationException();
 }
-    
+
 public static class Helpers
 {
     public static string ReverseString(this string input) => new([.. input.Reverse()]);
@@ -107,6 +114,19 @@ public static class Helpers
             permutations = newPermutations;
         }
         return [.. permutations];
+    }
+
+    public static IEnumerable<T[]> GetDiagonals<T>(this T[][] lines)
+    {
+        var rowCount = lines.Length;
+        var colCount = lines[0].Length;
+        for (var line = 1; line <= (rowCount + colCount - 1); line++)
+        {
+            var startCol = Math.Max(0, line - rowCount);
+            var count = Math.Min(line, Math.Min(colCount - startCol, rowCount));
+            yield return [.. Enumerable.Range(0, count)
+                .Select(i => lines[Math.Min(rowCount, line) - i - 1][startCol + i])];
+        }
     }
 
     public static int NumberOfDigits(this long value)

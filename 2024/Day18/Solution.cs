@@ -30,10 +30,10 @@ class Solution : Solver
         return $"{bytes[low].Col},{bytes[low].Row}";
     }
 
-    public static char[][] GetGrid(Pos[] firstBytes) => 
+    public static char[][] GetGrid(Pos[] corruptBytes) => 
         Enumerable.Range(0, Height)
             .Select(row => Enumerable.Range(0, Width)
-                .Select(col => firstBytes.Contains(new Pos(col, row)) ? '#' : '.')
+                .Select(col => corruptBytes.Contains(new(col, row)) ? '#' : '.')
                 .ToArray())
             .ToArray();
 }
@@ -43,17 +43,16 @@ static class Extensions
     public static Pos[] ParseInput(this string[] lines) =>
         [.. lines.Select(l => l.Split(",")).Select(l => new Pos(int.Parse(l[0]), int.Parse(l[1])))];
 
-
     public static int? GetMinimumSteps(this char[][] grid)
     {
-        var start = new Pos(0, 0);
-        var end = new Pos(grid[0].Length - 1, grid.Length - 1);
-        Queue<(Pos Pos, int Steps)> queue = [];
+        Pos start = new(0, 0);
+        Pos end = new(grid[0].Length - 1, grid.Length - 1);
+        Queue<(Pos, int)> queue = [];
         queue.Enqueue((start, 0));
         HashSet<Pos> seen = [start];
         while (queue.Count != 0)
         {
-            var (pos, price) = queue.Dequeue();
+            var (pos, steps) = queue.Dequeue();
             foreach (var dir in Directions.All)
             {
                 var next = pos + dir;
@@ -63,10 +62,10 @@ static class Extensions
                 }
                 if (next == end)
                 {
-                    return price + 1;
+                    return steps + 1;
                 }
                 seen.Add(next);
-                queue.Enqueue((next, price + 1));
+                queue.Enqueue((next, steps + 1));
             }
         }
         return null;

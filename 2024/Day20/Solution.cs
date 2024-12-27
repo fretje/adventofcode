@@ -35,9 +35,8 @@ class Solution : Solver
     private static Dictionary<Pos, int> ParseInput(string[] lines)
     {
         var grid = lines.ToGrid();
-        var startPos = grid.AllCells().Single(c => c.Value == 'S').Pos;
+        var curPos = grid.AllCells().Single(c => c.Value == 'S').Pos;
         var endPos = grid.AllCells().Single(c => c.Value == 'E').Pos;
-        var curPos = startPos;
         Dictionary<Pos, int> distances = [];
         distances[curPos] = 0;
         while (curPos != endPos)

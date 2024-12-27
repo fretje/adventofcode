@@ -31,19 +31,16 @@ class Solution : Solver
                     readingGrid = false;
                     continue;
                 }
-                if (part2)
-                {
-                    grid.Add([.. line.ToCharArray().SelectMany(c => c switch
-                    {
-                        '#' => "##".ToCharArray(),
-                        'O' => "[]".ToCharArray(),
-                        '.' => "..".ToCharArray(),
-                        '@' => "@.".ToCharArray(),
-                        _ => throw new InvalidOperationException(),
-                    })]);
-                    continue;
-                }
-                grid.Add(line.ToCharArray());
+                grid.Add((part2 
+                    ?  [.. line.ToCharArray().SelectMany((c) => c switch
+                        {
+                            '#' => (char[])['#', '#'],
+                            'O' => ['[', ']'],
+                            '.' => ['.', '.'],
+                            '@' => ['@', '.'],
+                            _ => throw new InvalidOperationException(),
+                        })] 
+                    : line.ToCharArray()));
                 continue;
             }
             moves.AddRange(line.ToCharArray().Select(Directions.FromChar));
@@ -53,7 +50,7 @@ class Solution : Solver
 
     private static void ExecuteMoves(char[][] grid, Pos[] moves)
     {
-        var robot = grid.AllCells().Where(c => c.Value == '@').Single().Pos;
+        var robot = grid.AllCells().Single(c => c.Value == '@').Pos;
         foreach (var move in moves)
         {
             HashSet<Pos> positionsToMove = GetPositionsToMove(robot, move, grid);

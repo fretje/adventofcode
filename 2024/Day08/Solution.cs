@@ -53,13 +53,13 @@ internal class Solution : Solver
         Dictionary<char, List<Pos>> antennaGroups = [];
         foreach (var cell in grid.AllCells().Where(cell => cell.Value != '.'))
         {
-            if (!antennaGroups.TryGetValue(cell.Value, out var value))
+            if (antennaGroups.TryGetValue(cell.Value, out var antennaGroup))
             {
-                antennaGroups[cell.Value] = [cell.Pos];
+                antennaGroup.Add(cell.Pos);
             }
             else
             {
-                value.Add(cell.Pos);
+                antennaGroups[cell.Value] = [cell.Pos];
             }
         }
         return (grid, antennaGroups);

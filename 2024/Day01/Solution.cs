@@ -6,8 +6,7 @@ internal class Solution : Solver
     public object PartOne(string[] lines)
     {
         var (leftColumn, rightColumn) = Parse(lines);
-        return leftColumn.Order().Zip(rightColumn.Order())
-            .Sum(x => Math.Abs(x.First - x.Second));
+        return leftColumn.Order().Zip(rightColumn.Order(), (left, right) => Math.Abs(left - right)).Sum();
     }
 
     public object PartTwo(string[] lines)
