@@ -6,7 +6,6 @@ class Solution : Solver
     public object PartOne(string[] lines)
     {
         var blocks = GetBlocks(lines[0]);
-
         int numberOfFileBlocks = blocks.Count(b => b != -1);
         for (int i = blocks.Count - 1; i >= numberOfFileBlocks; i--)
         {
@@ -17,7 +16,6 @@ class Solution : Solver
                 blocks[i] = -1;
             }
         }
-
         return CalculateChecksum(blocks);
     }
 
@@ -25,46 +23,47 @@ class Solution : Solver
     {
         var blocks = GetBlocks(lines[0]);
 
-        Dictionary<int, List<int>> files = [];
-        for (int i = 0; i < blocks.Count; i++)
+        Dictionary<int, List<int>> files = []; // maps file index to block indexes
+        List<(int BlockIndex, int Size)> gaps = [];
+        for (int blockIndex = 0; blockIndex < blocks.Count; blockIndex++)
         {
-            if (blocks[i] != -1)
+            if (blocks[blockIndex] != -1)
             {
-                if (!files.TryGetValue(blocks[i], out var fileBlocks))
+                if (!files.TryGetValue(blocks[blockIndex], out var fileBlocks))
                 {
                     fileBlocks = [];
-                    files[blocks[i]] = fileBlocks;
+                    files[blocks[blockIndex]] = fileBlocks;
                 }
-
-                fileBlocks.Add(i);
+                fileBlocks.Add(blockIndex);
+            }
+            else
+            {
+                var gapBlockIndex = blockIndex;
+                while (blockIndex < blocks.Count - 1 && blocks[blockIndex + 1] == -1)
+                {
+                    blockIndex++;
+                }
+                gaps.Add((gapBlockIndex, blockIndex - gapBlockIndex + 1));
             }
         }
 
         foreach (var fileIndex in files.Keys.OrderDescending())
         {
             var fileBlocks = files[fileIndex];
-            if (FirstGapWithSize(fileBlocks.Count, fileBlocks[0]) is { } gapIndex && gapIndex > -1)
+            if (gaps.FirstOrDefault(gap => gap.Size >= fileBlocks.Count && gap.BlockIndex < fileBlocks[0]) is var gap && gap != default)
             {
                 for (int i = 0; i < fileBlocks.Count; i++)
                 {
-                    blocks[gapIndex + i] = fileIndex;
+                    blocks[gap.BlockIndex + i] = fileIndex;
                     blocks[fileBlocks[i]] = -1;
                 }
-            }
-        }
-
-        int FirstGapWithSize(int size, int before)
-        {
-            for (int i = 0; i < before && i < blocks.Count; i++)
-            {
-                if (blocks[i] == -1 
-                    && i + size <= blocks.Count 
-                    && blocks.GetRange(i, size).All(b => b == -1))
+                var gapIndex = gaps.IndexOf(gap);
+                gaps.Remove(gap);
+                if (gap.Size > fileBlocks.Count)
                 {
-                    return i;
+                    gaps.Insert(gapIndex, (gap.BlockIndex + fileBlocks.Count, gap.Size - fileBlocks.Count));
                 }
             }
-            return -1;
         }
 
         return CalculateChecksum(blocks);
