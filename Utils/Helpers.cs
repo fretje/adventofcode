@@ -2,65 +2,6 @@
 
 namespace AdventOfCode;
 
-public record struct Pos(int Col, int Row)
-{
-    public static Pos operator +(Pos a, Pos b) => new(a.Col + b.Col, a.Row + b.Row);
-}
-
-public record struct Pose(Pos Pos, Pos Dir)
-{
-    public readonly Pose Move() => new(Pos + Dir, Dir);
-    public readonly Pose TurnLeft() => new(Pos, Directions.TurnLeft(Dir));
-    public readonly Pose TurnRight() => new(Pos, Directions.TurnRight(Dir));
-}
-
-public static class Directions
-{
-    public static readonly Pos Right = new(1, 0);
-    public static readonly Pos Down = new(0, 1);
-    public static readonly Pos Left = new(-1, 0);
-    public static readonly Pos Up = new(0, -1);
-
-    public static readonly Pos[] Othogonal = [Right, Down, Left, Up];
-
-    public static readonly Pos UpLeft = new(-1, -1);
-    public static readonly Pos UpRight = new(1, -1);
-    public static readonly Pos DownRight = new(1, 1);
-    public static readonly Pos DownLeft = new(-1, 1);
-
-    public static readonly Pos[] Diagonal = [UpLeft, UpRight, DownRight, DownLeft];
-
-    public static Pos FromChar(char c) => c switch
-    {
-        '<' => Left,
-        '>' => Right,
-        '^' => Up,
-        'v' => Down,
-        _ => throw new InvalidOperationException()
-    };
-
-    public static char ToChar(Pos pos) => 
-        pos == Left ? '<' 
-        : pos == Right ? '>' 
-        : pos == Up ? '^' 
-        : pos == Down ? 'v' 
-        : throw new InvalidOperationException();
-
-    public static Pos TurnRight(Pos direction) =>
-        direction == Up ? Right
-        : direction == Right ? Down
-        : direction == Down ? Left
-        : direction == Left ? Up
-        : throw new InvalidOperationException();
-
-    public static Pos TurnLeft(Pos direction) =>
-        direction == Up ? Left
-        : direction == Left ? Down
-        : direction == Down ? Right
-        : direction == Right ? Up
-        : throw new InvalidOperationException();
-}
-
 public static class Helpers
 {
     public static string ReverseString(this string input) => new([.. input.Reverse()]);
@@ -96,6 +37,32 @@ public static class Helpers
 
     public static T[][] DeepClone<T>(this T[][] grid) =>
         grid.Select(r => r.ToArray()).ToArray();
+
+    public static int? GetMinimumSteps(this char[][] grid, Pos start, Pos end)
+    {
+        Queue<(Pos, int)> queue = [];
+        queue.Enqueue((start, 0));
+        HashSet<Pos> seen = [start];
+        while (queue.Count != 0)
+        {
+            var (pos, steps) = queue.Dequeue();
+            foreach (var dir in Directions.Othogonal)
+            {
+                var next = pos + dir;
+                if (!grid.Contains(next) || grid.ValueAt(next) == '#' || seen.Contains(next))
+                {
+                    continue;
+                }
+                if (next == end)
+                {
+                    return steps + 1;
+                }
+                seen.Add(next);
+                queue.Enqueue((next, steps + 1));
+            }
+        }
+        return null;
+    }
 
     public static IEnumerable<IEnumerable<T>> CartesianProduct<T>(this IEnumerable<IEnumerable<T>> sequences)
     {

@@ -15,13 +15,13 @@ internal class Solution : Solver
         return GetObstructionsWithLoopCount(grid, GetGuard(grid));
     }
 
-    private static (Pos Pos, Pos Dir) GetGuard(char[][] grid) =>
-        (grid.AllCells().First(c => c.Value == '^').Pos, Directions.Up);
+    private static Pose GetGuard(char[][] grid) =>
+        new(grid.AllCells().First(c => c.Value == '^').Pos, Directions.Up);
 
-    private static Pos[] GetDistinctPositions(char[][] grid, (Pos Pos, Pos Dir) guard) =>
+    private static Pos[] GetDistinctPositions(char[][] grid, Pose guard) =>
         [.. WalkGuard(guard, grid).Select(p => p.Pos).Distinct()];
 
-    private static int GetObstructionsWithLoopCount(char[][] grid, (Pos Pos, Pos Dir) guard)
+    private static int GetObstructionsWithLoopCount(char[][] grid, Pose guard)
     {
         var distinctPositions = GetDistinctPositions(grid, guard);
         var obstructionsWithLoopCount = 0;
@@ -37,12 +37,12 @@ internal class Solution : Solver
         return obstructionsWithLoopCount;
     }
 
-    private static bool HasLoop(char[][] grid, (Pos Pos, Pos Dir) guard)
+    private static bool HasLoop(char[][] grid, Pose guard)
     {
-        HashSet<(Pos, Pos)> visited = [];
-        foreach (var pos in WalkGuard(guard, grid))
+        HashSet<Pose> visited = [];
+        foreach (var pose in WalkGuard(guard, grid))
         {
-            if (!visited.Add(pos))
+            if (!visited.Add(pose))
             {
                 return true;
             }
@@ -50,23 +50,23 @@ internal class Solution : Solver
         return false;
     }
 
-    private static IEnumerable<(Pos Pos, Pos Dir)> WalkGuard((Pos Pos, Pos Dir) current, char[][] grid)
+    private static IEnumerable<Pose> WalkGuard(Pose current, char[][] grid)
     {
         yield return current;
-        while (NextGuardPos(current, grid) is { } next)
+        while (NextGuardPose(current, grid) is { } next)
         {
             yield return next;
             current = next;
         }
     }
 
-    private static (Pos Pos, Pos Dir)? NextGuardPos((Pos Pos, Pos Dir) current, char[][] grid)
+    private static Pose? NextGuardPose(Pose current, char[][] grid)
     {
-        var nextPos = current.Pos + current.Dir;
-        return grid.Contains(nextPos)
-            ? grid.ValueAt(nextPos) == '#'
-                ? NextGuardPos((current.Pos, Directions.TurnRight(current.Dir)), grid)
-                : (nextPos, current.Dir)
+        var next = current.Move();
+        return grid.Contains(next.Pos)
+            ? grid.ValueAt(next.Pos) == '#'
+                ? NextGuardPose(current.TurnRight(), grid)
+                : next
             : null;
     }
 }
