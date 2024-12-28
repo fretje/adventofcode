@@ -31,9 +31,9 @@ internal partial class Solution : Solver
             .Where(c => c.Value == 'A')
             .Select(c => c.Pos)
             .Count(pos =>
-                ((grid.ValueAt(pos, new Pos(-1, -1)) == 'M' && grid.ValueAt(pos, new Pos(1, 1)) == 'S')
-                    || (grid.ValueAt(pos, new Pos(-1, -1)) == 'S' && grid.ValueAt(pos, new Pos(1, 1)) == 'M'))
-                && ((grid.ValueAt(pos, new Pos(-1, 1)) == 'M' && grid.ValueAt(pos, new Pos(1, -1)) == 'S')
-                    || (grid.ValueAt(pos, new Pos(-1, 1)) == 'S' && grid.ValueAt(pos, new Pos(1, -1)) == 'M')));
+                ((grid.ValueAt(pos + Directions.UpLeft) == 'M' && grid.ValueAt(pos + Directions.DownRight) == 'S')
+                    || (grid.ValueAt(pos + Directions.UpLeft) == 'S' && grid.ValueAt(pos + Directions.DownRight) == 'M'))
+                && ((grid.ValueAt(pos + Directions.DownLeft) == 'M' && grid.ValueAt(pos + Directions.UpRight) == 'S')
+                    || (grid.ValueAt(pos + Directions.DownLeft) == 'S' && grid.ValueAt(pos + Directions.UpRight) == 'M')));
     }
 }

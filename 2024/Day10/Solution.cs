@@ -18,22 +18,16 @@ class Solution : Solver
 
     private static int CalculateScore(Pos pos, int[][] grid, bool part2 = false, HashSet<Pos>? seen = null)
     {
-        if (!part2)
+        if (!part2 && (!grid.Contains(pos) || !(seen ??= []).Add(pos)))
         {
-            seen ??= [];
-            if (!grid.Contains(pos) || seen.Contains(pos))
-            {
-                return 0;
-            }
-            seen.Add(pos);
+            return 0;
         }
-        var value = grid.ValueAt(pos);
-        if (value == 9)
+        if (grid.ValueAt(pos) == 9)
         {
             return 1;
         }
         return Directions.Othogonal
-            .Where(dir => grid.ValueAt(pos, dir) == value + 1)
+            .Where(dir => grid.ValueAt(pos + dir) == grid.ValueAt(pos) + 1)
             .Sum(dir => CalculateScore(pos + dir, grid, part2, seen));
     }
 }
