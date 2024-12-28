@@ -86,10 +86,11 @@ internal class Runner
         var iline = 0;
         var answers = new List<string>();
         var errors = new List<string>();
-        var stopwatch = Stopwatch.StartNew();
+        var timestamp = Stopwatch.GetTimestamp();
+
         foreach (var line in solver.Solve(input))
         {
-            var ticks = stopwatch.ElapsedTicks;
+            var elapsedTime = Stopwatch.GetElapsedTime(timestamp);
             if (line is OcrString ocrString)
             {
                 Console.WriteLine("\n" + ocrString.st.Indent(10, firstLine: true));
@@ -107,7 +108,7 @@ internal class Runner
 
             Write(statusColor, $"{indent}  {status}");
             Console.Write($" {line} ");
-            var diff = ticks * 1000.0 / Stopwatch.Frequency;
+            var diff = elapsedTime.TotalMilliseconds;
 
             WriteLine(
                 diff > 1000 ? ConsoleColor.Red :
@@ -116,10 +117,10 @@ internal class Runner
                 $"({diff:F3} ms)"
             );
             iline++;
-            stopwatch.Restart();
+            timestamp = Stopwatch.GetTimestamp();
         }
 
-        return new SolverResult([.. answers], [.. errors]);
+        return new([.. answers], [.. errors]);
     }
 
     public static void RunAll(params Solver[] solvers)
@@ -138,7 +139,6 @@ internal class Runner
         List<(int day, int sloc)> slocs = [];
         foreach (var solver in solvers)
         {
-
             if (lastYear != solver.Year())
             {
                 SlocChart.Show(slocs);
