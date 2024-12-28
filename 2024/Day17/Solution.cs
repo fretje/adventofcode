@@ -15,7 +15,7 @@ class Solution : Solver
         return FindCorrectRegA(program, 0) ?? throw new InvalidOperationException("No correct reg a was found");
     }
 
-    private static (long RegA, long RegB, long RegC, int[] Program) ParseInput(string[] lines)
+    private static (long, long, long, int[]) ParseInput(string[] lines)
     {
         var regA = long.Parse(lines[0].Split(' ').Last());
         var regB = long.Parse(lines[1].Split(' ').Last());

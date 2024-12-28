@@ -25,13 +25,11 @@ class Solution : Solver
             var (a, b) = (parts[0], parts[1]);
             if (!graph.TryGetValue(a, out var aConnections))
             {
-                aConnections = [];
-                graph[a] = aConnections;
+                graph[a] = aConnections = [];
             }
             if (!graph.TryGetValue(b, out var bConnections))
             {
-                bConnections = [];
-                graph[b] = bConnections;
+                graph[b] = bConnections = [];
             }
             aConnections.Add(b);
             bConnections.Add(a);

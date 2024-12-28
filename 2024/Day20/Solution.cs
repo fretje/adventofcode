@@ -11,7 +11,7 @@ class Solution : Solver
                 start.Key + Directions.Right + Directions.Right, start.Key + Directions.Right + Directions.Down,
                 start.Key + Directions.Down  + Directions.Down,  start.Key + Directions.Down  + Directions.Left,
                 start.Key + Directions.Left  + Directions.Left,  start.Key + Directions.Left  + Directions.Up,])
-            .Count(end => distances.TryGetValue(end, out var endDistance) && start.Value - endDistance >= 102));
+            .Count(end => distances.TryGetValue(end, out var endDist) && start.Value - endDist >= 102));
     }
 
     public object PartTwo(string[] lines)
@@ -20,10 +20,11 @@ class Solution : Solver
         var count = 0;
         Parallel.ForEach(distances, start =>
         {
-            foreach (var end in distances)
+            var (startPos, startDist) = start;
+            foreach (var (endPos, endDist) in distances)
             {
-                var distanceFromStart = Math.Abs(end.Key.Col - start.Key.Col) + Math.Abs(end.Key.Row - start.Key.Row);
-                if (distanceFromStart <= 20 && start.Value - end.Value - distanceFromStart >= 100)
+                var distFromStart = Math.Abs(endPos.Col - startPos.Col) + Math.Abs(endPos.Row - startPos.Row);
+                if (distFromStart <= 20 && startDist - endDist - distFromStart >= 100)
                 {
                     Interlocked.Increment(ref count);
                 }

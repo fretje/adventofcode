@@ -1,19 +1,24 @@
 ﻿namespace AdventOfCode;
 
+public record struct GridCell<T>(T Value, Pos Pos);
+
 internal static class GridExtensions
 {
     public static char[][] ToGrid(this string[] lines) => [.. lines.Select(line => line.ToCharArray())];
 
-    public static IEnumerable<(T Value, Pos Pos)> AllCells<T>(this T[][] grid)
+    public static IEnumerable<GridCell<T>> AllCells<T>(this T[][] grid)
     {
         for (var row = 0; row < grid.Length; row++)
         {
             for (var col = 0; col < grid[row].Length; col++)
             {
-                yield return (grid[row][col], new(col, row));
+                yield return new(grid[row][col], new(col, row));
             }
         }
     }
+
+    public static GridCell<T> CellAt<T>(this T[][] grid, Pos pos) =>
+        new(grid[pos.Row][pos.Col], pos);
 
     public static T? ValueAt<T>(this T[][] grid, Pos pos) =>
         grid.Contains(pos) ? grid[pos.Row][pos.Col] : default;

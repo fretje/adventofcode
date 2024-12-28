@@ -32,11 +32,10 @@ class Solution : Solver
     public object PartTwo(string[] lines) =>
         lines[0].Split(' ').Select(long.Parse).Sum(i => StoneCountAfter(i, 75));
 
-    private readonly Dictionary<(long, int), long> _memo = [];
-
+    private readonly Dictionary<(long, int), long> _cache = [];
     public long StoneCountAfter(long value, int generations)
     {
-        if (!_memo.TryGetValue((value, generations), out var result))
+        if (!_cache.TryGetValue((value, generations), out var result))
         {
             result = (value, generations) switch
             {
@@ -47,7 +46,7 @@ class Solution : Solver
                     + StoneCountAfter(long.Parse(str[(str.Length / 2)..]), generations - 1),
                 _ => StoneCountAfter(value * 2024, generations - 1)
             };
-            _memo[(value, generations)] = result;
+            _cache[(value, generations)] = result;
         }
         return result;
     }

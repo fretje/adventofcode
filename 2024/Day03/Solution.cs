@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode.Y2024.Day03;
+﻿using System.Diagnostics;
+
+namespace AdventOfCode.Y2024.Day03;
 
 [ProblemName("Mull It Over")]
 internal partial class Solution : Solver
@@ -7,25 +9,25 @@ internal partial class Solution : Solver
 
     public object PartTwo(string[] lines)
     {
-        var multiplications = 0;
+        var sum = 0;
         var rest = string.Join("", lines);
         while (rest.Length > 0)
         {
             var dontIndex = rest.IndexOf("don't()");
             if (dontIndex == -1)
             {
-                return multiplications + GetMultiplications(rest);
+                return sum + GetMultiplications(rest);
             }
-            multiplications += GetMultiplications(rest[0..dontIndex]);
+            sum += GetMultiplications(rest[0..dontIndex]);
             rest = rest[(dontIndex + 7)..];
             var doIndex = rest.IndexOf("do()");
             if (doIndex == -1)
             {
-                return multiplications;
+                return sum;
             }
             rest = rest[(doIndex + 4)..];
         }
-        return multiplications;
+        throw new UnreachableException();
     }
 
     private static int GetMultiplications(string line) =>

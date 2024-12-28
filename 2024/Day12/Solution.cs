@@ -12,7 +12,7 @@ class Solution : Solver
 
 public static class Extensions
 {
-    public static IEnumerable<HashSet<Pos>> GetRegions(this char[][] grid)
+    public static List<HashSet<Pos>> GetRegions(this char[][] grid)
     {
         List<HashSet<Pos>> regions = [];
         foreach (var (_, pos) in grid.AllCells())
@@ -23,8 +23,8 @@ public static class Extensions
             }
             var region = GetRegion(pos, grid);
             regions.Add(region);
-            yield return region;
         }
+        return regions;
     }
 
     private static HashSet<Pos> GetRegion(Pos pos, char[][] grid)
@@ -47,16 +47,13 @@ public static class Extensions
 
     public static int GetPerimeter(this HashSet<Pos> region) => GetPerimeters(region).Count();
 
-    private static IEnumerable<(Pos Pos, Pos Dir)> GetPerimeters(HashSet<Pos> region)
+    private static IEnumerable<Pose> GetPerimeters(HashSet<Pos> region)
     {
         foreach (var pos in region)
         {
-            foreach (var dir in Directions.Othogonal)
+            foreach (var dir in Directions.Othogonal.Where(dir => !region.Contains(pos + dir)))
             {
-                if (!region.Contains(pos + dir))
-                {
-                    yield return (pos, dir);
-                }
+                yield return new(pos, dir);
             }
         }
     }

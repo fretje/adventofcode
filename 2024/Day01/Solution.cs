@@ -15,7 +15,7 @@ internal class Solution : Solver
         return leftColumn.Sum(left => left * rightColumn.Count(right => right == left));
     }
 
-    private static (List<int> LeftColumn, List<int> RightColumn) Parse(string[] lines) =>
+    private static (List<int>, List<int>) Parse(string[] lines) =>
         lines
             .Select(line => line.Split("   "))
             .Select(parts => (Left: int.Parse(parts[0]), Right: int.Parse(parts[1])))

@@ -53,62 +53,59 @@ class Solution : Solver
         var robot = grid.AllCells().Single(c => c.Value == '@').Pos;
         foreach (var move in moves)
         {
-            HashSet<Pos> positionsToMove = GetPositionsToMove(robot, move, grid);
-            if (positionsToMove.Count == 0)
+            var cellsToMove = GetCellsToMove(robot, move, grid);
+            if (cellsToMove.Count == 0)
             {
                 continue;
             }
-            var copy = grid.DeepClone();
-            foreach (var pos in positionsToMove)
+            foreach (var cell in cellsToMove)
             {
-                grid.SetValueAt(pos, '.');
+                grid.SetValueAt(cell.Pos, '.');
             }
-            foreach (var pos in positionsToMove)
+            foreach (var cell in cellsToMove)
             {
-                grid.SetValueAt(pos + move, copy.ValueAt(pos));
+                grid.SetValueAt(cell.Pos + move, cell.Value);
             }
             robot += move;
         }
     }
 
-    static HashSet<Pos> GetPositionsToMove(Pos start, Pos direction, char[][] grid)
+    static HashSet<GridCell<char>> GetCellsToMove(Pos start, Pos direction, char[][] grid)
     {
-        HashSet<Pos> positions = [start];
-        HashSet<Pos> nextPositions = [start];
-        while (true)
+        HashSet<GridCell<char>> cellsToMove = [grid.CellAt(start)];
+        HashSet<Pos> seen = [start];
+        Queue<Pos> queue = [];
+        queue.Enqueue(start);
+        while (queue.Count > 0)
         {
-            HashSet<Pos> newNextPositions = [];
-            foreach (var pos in nextPositions)
+            var currentPos = queue.Dequeue();
+            var nextPos = currentPos + direction;
+            if (seen.Contains(nextPos))
             {
-                var nextPos = pos + direction;
-                if (positions.Contains(nextPos))
+                continue;
+            }
+            seen.Add(nextPos);
+            var nextValue = grid.ValueAt(nextPos);
+            if (nextValue is '#')
+            {
+                return [];
+            }
+            if ("O[]".Contains(nextValue))
+            {
+                cellsToMove.Add(grid.CellAt(nextPos));
+                queue.Enqueue(nextPos);
+                if (nextValue is '[')
                 {
-                    continue;
+                    cellsToMove.Add(grid.CellAt(nextPos + Directions.Right));
+                    queue.Enqueue(nextPos + Directions.Right);
                 }
-                var nextValue = grid.ValueAt(nextPos);
-                if (nextValue == '#')
+                else if (nextValue is ']')
                 {
-                    return [];
-                }
-                if ("O[]".Contains(nextValue))
-                {
-                    newNextPositions.Add(nextPos);
-                    if (nextValue == '[')
-                    {
-                        newNextPositions.Add(nextPos + Directions.Right);
-                    }
-                    else if (nextValue == ']')
-                    {
-                        newNextPositions.Add(nextPos + Directions.Left);
-                    }
+                    cellsToMove.Add(grid.CellAt(nextPos + Directions.Left));
+                    queue.Enqueue(nextPos + Directions.Left);
                 }
             }
-            if (newNextPositions.Count == 0)
-            {
-                return positions;
-            }
-            positions.UnionWith(newNextPositions);
-            nextPositions = newNextPositions;
         }
+        return cellsToMove;
     }
 }

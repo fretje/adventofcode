@@ -3,65 +3,66 @@
 [ProblemName("Linen Layout")]
 class Solution : Solver 
 {            
-    public object PartOne(string[] lines) 
+    public object PartOne(string[] lines)
     {
-        var availables = lines[0].Split(", ");
-        var maxLength = availables.Max(a => a.Length);
-        var designs = lines[2..];
+        var (availables, maxLength, designs) = ParseInput(lines);
         return designs.Count(d => IsPossible(d, availables, maxLength));
     }
 
     public object PartTwo(string[] lines) 
     {
-        var availables = lines[0].Split(", ");
-        var maxLength = availables.Max(a => a.Length);
-        var designs = lines[2..];
+        var (availables, maxLength, designs) = ParseInput(lines);
+        Dictionary<string, long> memo = [];
         return designs.Sum(d => PossibleCount(d, availables, maxLength));
     }
 
-    private static bool IsPossible(string design, string[] availables, int maxLength, Dictionary<string, bool>? memo = null)
+    private static (string[], int, string[]) ParseInput(string[] lines)
+    {
+        var availables = lines[0].Split(", ");
+        return (availables, availables.Max(a => a.Length), lines[2..]);
+    }
+
+    private static readonly Dictionary<string, bool> _isPossibleCache = [];
+    private static bool IsPossible(string design, string[] availables, int maxLength)
     {
         if (design == "")
         {
             return true;
         }
-        memo ??= [];
-        if (memo.TryGetValue(design, out var isPossible))
+        if (!_isPossibleCache.TryGetValue(design, out var isPossible))
         {
-            return isPossible;
-        }
-        for (int i = 0; i <= Math.Min(design.Length, maxLength); i++)
-        {
-            if (availables.Contains(design[..i]) 
-                && IsPossible(design[i..], availables, maxLength, memo))
+            for (int i = 0; i <= Math.Min(design.Length, maxLength); i++)
             {
-                isPossible = true;
-                break;
+                if (availables.Contains(design[..i])
+                    && IsPossible(design[i..], availables, maxLength))
+                {
+                    isPossible = true;
+                    break;
+                }
             }
+            _isPossibleCache[design] = isPossible;
         }
-        memo[design] = isPossible;
         return isPossible;
     }
 
-    private static long PossibleCount(string design, string[] availables, int maxLength, Dictionary<string, long>? memo = null)
+    private static readonly Dictionary<string, long> _possibleCountCache = [];
+    private static long PossibleCount(string design, string[] availables, int maxLength)
     {
         if (design == "")
         {
             return 1;
         }
-        memo ??= [];
-        if (memo.TryGetValue(design, out var possibleCount))
+        if (!_possibleCountCache.TryGetValue(design, out var possibleCount))
         {
-            return possibleCount;
-        }
-        for (int i = 0; i <= Math.Min(design.Length, maxLength); i++)
-        {
-            if (availables.Contains(design[..i]))
+            for (int i = 0; i <= Math.Min(design.Length, maxLength); i++)
             {
-                possibleCount += PossibleCount(design[i..], availables, maxLength, memo);
+                if (availables.Contains(design[..i]))
+                {
+                    possibleCount += PossibleCount(design[i..], availables, maxLength);
+                }
             }
+            _possibleCountCache[design] = possibleCount;
         }
-        memo[design] = possibleCount;
         return possibleCount;
     }
 }
