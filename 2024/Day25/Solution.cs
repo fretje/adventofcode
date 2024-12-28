@@ -37,5 +37,5 @@ class Solution : Solver
     private static bool KeyFitsLock(int[] key, int[] @lock) =>
         key.Zip(@lock).All(pair => pair.First + pair.Second <= 7);
 
-    public object PartTwo(string[] lines) => 0;
+    public object PartTwo(string[] lines) => null!;
 }

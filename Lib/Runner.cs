@@ -57,7 +57,7 @@ internal static class SolverExtensions
         if (File.Exists(file))
         {
             var solution = File.ReadAllText(file);
-            return Regex.Matches(solution, @"\n").Count;
+            return Regex.Count(solution, @"\n");
         }
         return -1;
     }
