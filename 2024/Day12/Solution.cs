@@ -30,28 +30,19 @@ public static class Extensions
     private static HashSet<Pos> GetRegion(Pos pos, char[][] grid)
     {
         HashSet<Pos> region = [pos];
-        HashSet<Pos> next = [.. region];
-        while (true)
+        Queue<Pos> queue = [];
+        queue.Enqueue(pos);
+        while (queue.Count > 0) 
         {
-            HashSet<Pos> newNext = [];
-            foreach (var p in next)
+            var currentPos = queue.Dequeue();
+            foreach (var nextPos in Directions.Othogonal
+                .Select(dir => currentPos + dir)
+                .Where(nextPos => grid.Contains(nextPos) && grid.ValueAt(nextPos) == grid.ValueAt(pos) && region.Add(nextPos)))
             {
-                foreach (var d in Directions.Othogonal)
-                {
-                    var newPos = p + d;
-                    if (!region.Contains(newPos) && grid.Contains(newPos) && grid.ValueAt(newPos) == grid.ValueAt(pos))
-                    {
-                        newNext.Add(newPos);
-                        region.Add(newPos);
-                    }
-                }
+                queue.Enqueue(nextPos);
             }
-            if (newNext.Count == 0)
-            {
-                return region;
-            }
-            next = newNext;
         }
+        return region;
     }
 
     public static int GetPerimeter(this HashSet<Pos> region) => GetPerimeters(region).Count();
@@ -72,21 +63,20 @@ public static class Extensions
 
     public static int GetSides(this HashSet<Pos> region)
     {
-        var perimetersPerDirection = GetPerimeters(region).GroupBy(per => per.Dir).ToDictionary(
-            perimeters => perimeters.Key, 
-            perimeters => perimeters.Select(per => per.Pos)
-                .OrderBy(pos => perimeters.Key == Directions.Left || perimeters.Key == Directions.Right ? pos.Row : pos.Col).ToList());
-        foreach (var (dir, perimeters) in perimetersPerDirection)
+        var sides = 0;
+        foreach (var (dir, perimeters) in GetPerimeters(region).GroupBy(per => per.Dir).Select(g =>
+            (g.Key == Directions.Left || g.Key == Directions.Right ? Directions.Up : Directions.Left, 
+             g.Select(per => per.Pos).OrderBy(pos => g.Key == Directions.Left || g.Key == Directions.Right ? pos.Row : pos.Col).ToList())))
         {
-            var nextDir = dir == Directions.Left || dir == Directions.Right ? Directions.Up : Directions.Left;
             for (int i = perimeters.Count - 1; i >= 0; i--)
             {
-                if (perimeters.Contains(perimeters[i] + nextDir))
+                if (perimeters.Contains(perimeters[i] + dir))
                 {
                     perimeters.RemoveAt(i);
                 }
             }
+            sides += perimeters.Count;
         }
-        return perimetersPerDirection.Values.Sum(per => per.Count);
+        return sides;
     }
 }
