@@ -11,25 +11,27 @@ class Solution : Solver
         lines.Sum(line =>
         {
             var bank = line.Select(x => x - '0').ToArray();
-            int[] maxValue = new int[numberOfBatteries];
-            int[] maxIndex = new int[numberOfBatteries];
+            int bankStartIndex = 0;
             var joltage = 0L;
 
             for (int batteryIndex = 0; batteryIndex < numberOfBatteries; batteryIndex++)
             {
-                for (int bankIndex = batteryIndex == 0 ? 0 : maxIndex[batteryIndex-1] + 1; 
+                int maxValue = 0;
+
+                for (int bankIndex = bankStartIndex; 
                     bankIndex < bank.Length - numberOfBatteries + batteryIndex + 1; 
                     bankIndex++)
                 {
-                    if (bank[bankIndex] <= maxValue[batteryIndex])
+                    if (bank[bankIndex] <= maxValue)
                     {
                         continue;
                     }
-                    maxValue[batteryIndex] = bank[bankIndex];
-                    maxIndex[batteryIndex] = bankIndex;
+
+                    maxValue = bank[bankIndex];
+                    bankStartIndex = bankIndex + 1;
                 }
 
-                joltage += maxValue[batteryIndex] * (long)Math.Pow(10, numberOfBatteries - batteryIndex - 1);
+                joltage += maxValue * (long)Math.Pow(10, numberOfBatteries - batteryIndex - 1);
             }
 
             return joltage;
