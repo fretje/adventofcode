@@ -13,9 +13,7 @@ class Solution : Solver
             .Sum(range =>
             {
                 var parts = range.Split('-');
-                var start = long.Parse(parts[0]);
-                var end = long.Parse(parts[1]);
-                return Range(start, end)
+                return Range(long.Parse(parts[0]), long.Parse(parts[1]))
                     .Where(partTwo ? IsInvalidPartTwo : IsInvalidPartOne)
                     .Sum();
             });
@@ -31,32 +29,16 @@ class Solution : Solver
     private static bool IsInvalidPartOne(long number)
     {
         var str = number.ToString();
-        if (str.Length % 2 != 0)
-        {
-            return false;
-        }
-
-        var left = str[..(str.Length / 2)];
-        var right = str[(str.Length / 2)..];
-
-        return left == right;
+        return str.Length % 2 == 0 && str[..(str.Length / 2)] == str[(str.Length / 2)..];
     }
 
     private static bool IsInvalidPartTwo(long number)
     {
         var str = number.ToString();
-        for (int segmentCount = 2; segmentCount <= str.Length; segmentCount++)
+        foreach (var segmentCount in Enumerable.Range(2, str.Length - 1))
         {
-            if (str.Length % segmentCount != 0)
-            {
-                continue;
-            }
-
-            var segmentLength = str.Length / segmentCount;
-            var segments = Enumerable.Range(0, segmentCount)
-                .Select(segmentIndex => str[(segmentIndex * segmentLength)..((segmentIndex + 1) * segmentLength)]);
-            var first = segments.First();
-            if (segments.Skip(1).All(s => s == first))
+            if (str.Length % segmentCount == 0 
+                && str == string.Concat(Enumerable.Repeat(str[..(str.Length / segmentCount)], segmentCount)))
             {
                 return true;
             }

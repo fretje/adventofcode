@@ -17,7 +17,6 @@ class Solution : Solver
             for (int batteryIndex = 0; batteryIndex < numberOfBatteries; batteryIndex++)
             {
                 int maxValue = 0;
-
                 for (int bankIndex = bankStartIndex; 
                     bankIndex < bank.Length - numberOfBatteries + batteryIndex + 1; 
                     bankIndex++)
