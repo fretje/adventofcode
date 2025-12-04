@@ -16,6 +16,8 @@ public static class Directions
 
     public static readonly Pos[] Diagonal = [UpLeft, UpRight, DownRight, DownLeft];
 
+    public static readonly Pos[] All = [.. Othogonal, .. Diagonal];
+
     public static Pos FromChar(char c) => c switch
     {
         '<' => Left,

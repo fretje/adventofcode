@@ -30,7 +30,7 @@ internal static class GridExtensions
         pos.Row >= 0 && pos.Row < grid.Length && pos.Col >= 0 && pos.Col < grid[0].Length;
 
     public static T[][] DeepClone<T>(this T[][] grid) =>
-        grid.Select(r => r.ToArray()).ToArray();
+        [.. grid.Select(r => r.ToArray())];
 
     public static int? GetMinimumSteps(this char[][] grid, Pos start, Pos end)
     {
