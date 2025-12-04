@@ -7,38 +7,61 @@ class Solution : Solver
 
     public object PartTwo(string[] lines) => Calculate(lines[0], partTwo: true);
 
-    public static long Calculate(string line, bool partTwo = false) => 
-        line
-            .Split(',')
-            .Sum(range =>
+    public static long Calculate(ReadOnlySpan<char> line, bool partTwo = false)
+    {
+        var sum = 0L;        
+        foreach (var range in line.Split(','))
+        {
+            var rangeSpan = line[range];
+            var dashIndex = rangeSpan.IndexOf('-');
+            var start = long.Parse(rangeSpan[..dashIndex]);
+            var end = long.Parse(rangeSpan[(dashIndex + 1)..]);
+            
+            for (var num = start; num <= end; num++)
             {
-                var parts = range.Split('-');
-                return Range(long.Parse(parts[0]), long.Parse(parts[1]))
-                    .Where(partTwo ? IsInvalidPartTwo : IsInvalidPartOne)
-                    .Sum();
-            });
-
-    private static IEnumerable<long> Range(long start, long end)
-    {
-        for (long i = start; i <= end; i++)
-        {
-            yield return i;
+                if (IsInvalid(num, partTwo))
+                {
+                    sum += num;
+                }
+            }
         }
+
+        return sum;
     }
 
-    private static bool IsInvalidPartOne(long number)
+    private static bool IsInvalid(long number, bool partTwo)
     {
         var str = number.ToString();
-        return str.Length % 2 == 0 && str[..(str.Length / 2)] == str[(str.Length / 2)..];
-    }
+        var len = str.Length;
 
-    private static bool IsInvalidPartTwo(long number)
-    {
-        var str = number.ToString();
-        foreach (var segmentCount in Enumerable.Range(2, str.Length - 1))
+        if (!partTwo)
         {
-            if (str.Length % segmentCount == 0 
-                && str == string.Concat(Enumerable.Repeat(str[..(str.Length / segmentCount)], segmentCount)))
+            return len % 2 == 0 && str.AsSpan(0, len / 2).SequenceEqual(str.AsSpan(len / 2));
+        }
+
+        for (var segmentLength = 1; segmentLength <= len / 2; segmentLength++)
+        {
+            if (!partTwo && segmentLength != len / 2)
+            {
+                continue;
+            }
+            if (len % segmentLength != 0)
+            {
+                continue;
+            }
+
+            var segment = str.AsSpan(0, segmentLength);
+            var allMatch = true;
+            for (var i = segmentLength; i < len; i += segmentLength)
+            {
+                if (!str.AsSpan(i, segmentLength).SequenceEqual(segment))
+                {
+                    allMatch = false;
+                    break;
+                }
+            }
+
+            if (allMatch)
             {
                 return true;
             }
