@@ -3,6 +3,7 @@ using System.Reflection;
 using AdventOfCode.Generator;
 using AdventOfCode.Model;
 using AngleSharp;
+using AngleSharp.Dom;
 using AngleSharp.Io;
 
 namespace AdventOfCode;
@@ -127,7 +128,7 @@ internal class Updater
             var config = Configuration.Default;
             var context = BrowsingContext.New(config);
             var document = await context.OpenAsync(req => req.Content(responseString));
-            var article = document.Body.QuerySelector("body > main > article").TextContent;
+            var article = document.Body?.QuerySelector("body > main > article")?.TextContent ?? throw new InvalidOperationException("Missing article");
             article = Regex.Replace(article, @"\[Continue to Part Two.*", "", RegexOptions.Singleline);
             article = Regex.Replace(article, @"You have completed Day.*", "", RegexOptions.Singleline);
             article = Regex.Replace(article, @"\(You guessed.*", "", RegexOptions.Singleline);
@@ -189,7 +190,7 @@ internal class Updater
         Console.ForegroundColor = color;
 
         var problemStatement = await context.OpenAsync(uri);
-        var input = await context.GetService<IDocumentLoader>().FetchAsync(
+        var input = await context.GetService<IDocumentLoader>()!.FetchAsync(
                 new DocumentRequest(new Url(baseUri + $"{year}/day/{day}/input"))).Task;
 
         return input.StatusCode != HttpStatusCode.OK

@@ -16,7 +16,8 @@ internal class Problem
         var md = ParseMdIntro(document, 3, url);
 
         var answers = ParseAnswers(document);
-        var title = document.QuerySelector("h2").TextContent;
+        var title = document.QuerySelector("h2")?.TextContent
+            ?? throw new InvalidOperationException("Missing title");
 
         var match = Regex.Match(title, ".*: (.*) ---");
         if (match.Success)
@@ -116,7 +117,7 @@ internal class Problem
                 yield return freshLine ? "</pre>\n" : "\n</pre>\n";
                 break;
             case "a":
-                yield return "[" + UnparseList("", node) + "](" + ((IElement)node).Attributes["href"].Value + ")";
+                yield return "[" + UnparseList("", node) + "](" + ((IElement)node).Attributes["href"]?.Value + ")";
                 break;
             case "br":
                 yield return "\n";

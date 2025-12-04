@@ -45,7 +45,7 @@ internal class Calendar
             .calendar a.calendar-verycomplete .calendar-mark-verycomplete { visibility: visible; color: #ffff66; }
             """);
 
-        document.Head.Append(q);
+        document.Head?.Append(q);
 
         foreach (var item in document.QuerySelectorAll("link"))
         {
@@ -57,7 +57,8 @@ internal class Calendar
             item.Remove();
         }
 
-        var calendar = document.QuerySelector(".calendar");
+        var calendar = document.QuerySelector(".calendar")
+            ?? throw new InvalidOperationException("Missing calendar");
 
         var r = new Random();
         string[] years = [
@@ -93,13 +94,13 @@ internal class Calendar
             var bold = !string.IsNullOrEmpty(style["text-shadow"]);
 
             if (style["position"] == "absolute" ||
-                textNode.ParentElement.ParentElement.ComputeCurrentStyle()["position"] == "absolute")
+                textNode.ParentElement?.ParentElement.ComputeCurrentStyle()["position"] == "absolute")
             {
                 continue;
             }
             var widthSpec = string.IsNullOrEmpty(style["width"]) ?
-                textNode.ParentElement.ParentElement.ComputeCurrentStyle()["width"] : style["width"];
-            if (textNode.ParentElement.NodeName != "I" && widthSpec != null)
+                textNode.ParentElement?.ParentElement.ComputeCurrentStyle()["width"] : style["width"];
+            if (textNode.ParentElement?.NodeName != "I" && widthSpec != null)
             {
                 var m = Regex.Match(widthSpec, "[.0-9]+");
                 if (m.Success)
@@ -142,15 +143,15 @@ internal class Calendar
         return new Calendar { Year = year, Theme = theme, Lines = lines };
     }
 
-    private static IEnumerable<INode> GetText(INode element)
+    private static IEnumerable<INode> GetText(INode? element)
     {
-        if (element.NodeType == NodeType.Text)
+        if (element?.NodeType is NodeType.Text)
         {
             yield return element;
         }
         else
         {
-            element = element.FirstChild;
+            element = element?.FirstChild;
             while (element != null)
             {
                 foreach (var text in GetText(element))
