@@ -10,14 +10,14 @@ class Solution : Solver
         List<(long Start, long End)> ranges = [];
         foreach (var line in lines)
         {
-            if (line is { Length: 0 })
-            {
-                readingRanges = false;
-                continue;
-            }
-
             if (readingRanges)
             {
+                if (line is { Length: 0 })
+                {
+                    readingRanges = false;
+                    continue;
+                }
+
                 var parts = line.Split('-');
                 ranges.Add((Start: long.Parse(parts[0]), End: long.Parse(parts[1])));
                 continue;
