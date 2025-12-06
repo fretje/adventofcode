@@ -1,65 +1,79 @@
-﻿using System.Diagnostics;
-
-namespace AdventOfCode.Y2025.Day06;
+﻿namespace AdventOfCode.Y2025.Day06;
 
 [ProblemName("Trash Compactor")]
 partial class Solution : Solver 
 {            
     public object PartOne(string[] lines) 
     {
-        var sum = 0L;
-        string[][] input = new string[lines.Length][];
-        for (int r = 0; r < lines.Length; r++)
+        var input = new string[lines.Length][];
+        for (int row = 0; row < lines.Length; row++)
         {
-            input[r] = lines[r].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            input[row] = lines[row].Split(' ', StringSplitOptions.RemoveEmptyEntries);
         }
-        for (int c = 0; c < input[0].Length; c++)
+        var total = 0L;
+        for (var col = 0; col < input[0].Length; col++)
         {
-            sum += input[4][c] switch
+            if (input[^1][col] is "+")
             {
-                "+" => long.Parse(input[0][c]) + long.Parse(input[1][c]) + long.Parse(input[2][c]) + long.Parse(input[3][c]),
-                "*" => long.Parse(input[0][c]) * long.Parse(input[1][c]) * long.Parse(input[2][c]) * long.Parse(input[3][c]),
-                _ => throw new UnreachableException(),
-            };
+                for (var row = 0; row < input.Length - 1; row++)
+                {
+                    total += long.Parse(input[row][col]);
+                }
+            }
+            else if (input[^1][col] is "*")
+            {
+                var prod = 1L;
+                for (var row = 0; row < input.Length - 1; row++)
+                {
+                    prod *= long.Parse(input[row][col]);
+                }
+                total += prod;
+            }
         }
-        return sum;
+        return total;
     }
 
     public object PartTwo(string[] lines) 
     {
-        var sum = 0L;
-        char[] number = new char[4];
+        var total = 0L;
+        var number = new char[lines.Length - 1];
         List<long> numbers = [];
-        for (int c = lines[0].Length - 1; c >= 0; c--)
+        for (var col = lines[0].Length - 1; col >= 0; col--)
         {
-            number[0] = lines[0][c];
-            number[1] = lines[1][c];
-            number[2] = lines[2][c];
-            number[3] = lines[3][c];
-            if (number[0] is ' ' && number[1] is ' ' && number[2] is ' ' && number[3] is ' ')
+            var isAllSpaces = true;
+            for (var row = 0; row < lines.Length - 1; row++)
+            {
+                number[row] = lines[row][col];
+                if (lines[row][col] is ' ')
+                {
+                    continue;
+                }
+                isAllSpaces = false;
+            }
+            if (isAllSpaces)
             {
                 continue;
             }
             numbers.Add(long.Parse(number));
-            if (lines[4][c] is '+')
+            if (lines[^1][col] is '+')
             {
-                for (int i = 0; i < numbers.Count; i++)
+                for (var i = 0; i < numbers.Count; i++)
                 {
-                    sum += numbers[i];
+                    total += numbers[i];
                 }
                 numbers.Clear();
             }
-            else if (lines[4][c] is '*')
+            else if (lines[^1][col] is '*')
             {
-                long prod = 1;
-                for (int i = 0; i < numbers.Count; i++)
+                var prod = 1L;
+                for (var i = 0; i < numbers.Count; i++)
                 {
                     prod *= numbers[i];
                 }
-                sum += prod;
+                total += prod;
                 numbers.Clear();
             }
         }
-        return sum;
+        return total;
     }
 }
