@@ -32,6 +32,11 @@ internal static class GridExtensions
     public static T[][] DeepClone<T>(this T[][] grid) =>
         [.. grid.Select(r => r.ToArray())];
 
+    public static void PrintToConsole<T>(this char[][] grid)
+    {
+        Array.ForEach(grid, row => Console.WriteLine(new string(row)));
+    }
+
     public static int? GetMinimumSteps(this char[][] grid, Pos start, Pos end)
     {
         Queue<(Pos, int)> queue = [];
