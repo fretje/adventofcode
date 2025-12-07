@@ -7,21 +7,21 @@ class Solution : Solver
     {
         var grid = lines.ToGrid();
         var splitCount = 0;
-        for (int row = 1; row < grid.Length; row++)
+        for (var row = 1; row < grid.Length; row++)
         {
-            for (int col = 0; col < grid[0].Length; col++)
+            for (var col = 0; col < grid[0].Length; col++)
             {
                 if (grid[row-1][col] is 'S' or '|')
                 {
-                    if (grid[row][col] == '.')
-                    {
-                        grid[row][col] = '|';
-                    }
-                    else if (grid[row][col] == '^')
+                    if (grid[row][col] is '^')
                     {
                         grid[row][col - 1] = '|';
                         grid[row][col + 1] = '|';
                         splitCount++;
+                    }
+                    else
+                    {
+                        grid[row][col] = '|';
                     }
                 }
             }
@@ -30,11 +30,10 @@ class Solution : Solver
     }
 
     public object PartTwo(string[] lines) =>
-        GetTimelineCount(new(lines[0].IndexOf('S'), 0), lines.ToGrid());
+        GetTimelineCount(new(lines[0].IndexOf('S'), 0), lines.ToGrid(), []);
 
-    private static long GetTimelineCount(Pos pos, char[][] grid, Dictionary<Pos, long>? memo = null)
+    private static long GetTimelineCount(Pos pos, char[][] grid, Dictionary<Pos, long> memo)
     {
-        memo ??= [];
         if (memo.TryGetValue(pos, out var value))
         {
             return value;
@@ -43,17 +42,10 @@ class Solution : Solver
         {
             return 1;
         }
-        var timelineCount = 0L;
-        Pos nextPos = new(pos.Col, pos.Row + 1);
-        if (grid.ValueAt(nextPos) is '.')
-        {
-            timelineCount += GetTimelineCount(nextPos, grid, memo);
-        }
-        else if (grid.ValueAt(nextPos) is '^')
-        {
-            timelineCount += GetTimelineCount(nextPos + Directions.Left, grid, memo);
-            timelineCount += GetTimelineCount(nextPos + Directions.Right, grid, memo);
-        }
+        var nextPos = pos + Directions.Down;
+        var timelineCount = grid.ValueAt(nextPos) is '^'
+            ? GetTimelineCount(nextPos + Directions.Left, grid, memo) + GetTimelineCount(nextPos + Directions.Right, grid, memo)
+            : GetTimelineCount(nextPos, grid, memo);
         memo[pos] = timelineCount;
         return timelineCount;
     }
