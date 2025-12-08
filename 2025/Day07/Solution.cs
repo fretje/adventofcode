@@ -30,9 +30,9 @@ class Solution : Solver
     }
 
     public object PartTwo(string[] lines) =>
-        GetTimelineCount(new(lines[0].IndexOf('S'), 0), lines.ToGrid(), []);
+        GetTimelineCount(new(lines[0].IndexOf('S'), 0), lines, []);
 
-    private static long GetTimelineCount(Pos pos, char[][] grid, Dictionary<Pos, long> memo)
+    private static long GetTimelineCount(Pos pos, string[] grid, Dictionary<Pos, long> memo)
     {
         if (memo.TryGetValue(pos, out var value))
         {
@@ -43,7 +43,7 @@ class Solution : Solver
             return 1;
         }
         var nextPos = pos + Directions.Down;
-        var timelineCount = grid.ValueAt(nextPos) is '^'
+        var timelineCount = grid[nextPos.Row][nextPos.Col] is '^'
             ? GetTimelineCount(nextPos + Directions.Left, grid, memo) + GetTimelineCount(nextPos + Directions.Right, grid, memo)
             : GetTimelineCount(nextPos, grid, memo);
         memo[pos] = timelineCount;
